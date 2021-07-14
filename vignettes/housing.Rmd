@@ -1,0 +1,9 @@
+---
+title: "Boston housing data"
+output: 
+  github_document:
+    toc_dept: 1
+---
+
+# Include the Boston housing data analysis here
+

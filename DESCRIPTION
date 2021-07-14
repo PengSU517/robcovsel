@@ -1,0 +1,12 @@
+Package: robcovsel
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Date: 2021-07-15
+Authors@R: c(person("Peng", "Su", role = c("aut", "cre"), email = "peng.su@sydney.edu.au", comment = c(ORCID = "0000-0000-0000-0000")), person("Garth", "Tarr", role = c("aut"), email = "garth.tarr@gmail.com", comment = c(ORCID = "0000-0002-6605-7478")), person("Samuel", "Mueller", role = "aut", email = "samuel.mueller@sydney.edu.au", comment = c(ORCID = "0000-0002-3087-8127")))
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
