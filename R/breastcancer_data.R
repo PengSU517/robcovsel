@@ -6,32 +6,25 @@
 #'
 #' @usage data(breastcancer_screened)
 #'
-#' @keywords datasets
+#' @keywords datasets; Breast Cancer
 #'
-#' @references Who et. al. (2010) Etc.
-#' (\href{https://www.google.com}{Link name here})
 #'
-#' @source \href{https://www.google.com}{Source}
-#'   \code{# importing the original dataset
-#'   dat = read_csv("breastcancer.csv")
-#'   computing robust correlations and then screening predictors
-#'   abscors = lapply(dat[,-1], function(x){abs(paircorxyf((dat$surtime),x))})
-#'   x = dat[,names(sort(unlist(abscors),decreasing = T))[1:200]]
-#'   y = dat$surtime
-#'   write.csv(data.frame(y,x), file = "breastcancer_screened.csv")}
+#' @source van 't Veer, L. J., Dai, H., van de Vijver, M. J., He, Y. D., Hart, A. A. M., Mao, M., Peterse,347H. L., van der Kooy, K., Marton, M. J., Witteveen, A. T., Schreiber, G. J., Kerkhoven,34825
+#' R. M., Roberts, C., Linsley, P. S., Bernards, R., and Friend, S. H. (2002). Gene expression349profiling predicts clinical outcome of breast cancer.Nature, 415(6871):530-536.
 #'
 #' @examples
 #' data(breastcancer_screened)
 #' x = breastcancer_screened[,-1]
 #' y = breastcancer_screened$y
+#'
 #' \donttest{
 #' #showing distribution of correlations
 #' corrs = paircorf(as.matrix(x))
-#' corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
+#' corrplot::corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
 #'
 #' #showing outlier detection results via DDC
-#' fit1 <- DDC(x)
-#' cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
+#' fit1 <- cellWise::DDC(x)
+#' cellWise::cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
 #'         rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)
 #'
 #'
