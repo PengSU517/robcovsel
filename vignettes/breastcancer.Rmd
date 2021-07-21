@@ -7,3 +7,46 @@ output:
 
 # Include the breast cancer analysis here
 
+```{r}
+{
+  library(cellWise)
+  library(corrplot)
+  
+  rm(list = ls()) # clean slate
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  source("roblasso.R")
+  source("robcov.R")
+  
+}
+
+# importing the original dataset
+# dat = read_csv("breastcancer.csv")
+# computing robust correlations and then screening predictors
+# abscors = lapply(dat[,-1], function(x){abs(paircorxyf((dat$surtime),x))})
+# x = dat[,names(sort(unlist(abscors),decreasing = T))[1:200]]
+# y = dat$surtime
+# write.csv(data.frame(y,x), file = "breastcancer_screened.csv")
+
+
+#importing the screened dataset
+dataset = (read.csv("breastcancer_screened.csv"))[,-1]
+x = dataset[,-1]
+y = dataset$y
+
+
+
+#showing distribution of correlations
+corrs = paircorf(as.matrix(x))
+corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
+
+#showing outlier detection results via DDC
+fit1 <- DDC(x)
+cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
+        rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)
+
+
+#variable selection results via pariwise estimator and Gaussrank estimator
+pairfit = covlasso(x,y,cor.method = "pair", scale.method = "qn", lmin = 0.1,adaptive = T)$betahat_opt
+gaussrankfit = covlasso(x,y,cor.method = "gaussrank", scale.method = "qn", lmin = 0.1, adaptive = T)$betahat_opt
+```
+
