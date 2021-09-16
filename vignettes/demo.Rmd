@@ -58,6 +58,8 @@ y = gen$y
 
 ```{r}
 system.time({fit = covlasso(x,y,cor.method = "pair",scale.method = "qn", pda.method = "nearpd")})  
+
+head(fit$betahat_opt)
 ```
 
 
