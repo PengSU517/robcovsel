@@ -1,0 +1,63 @@
+---
+title: "demo"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{demo}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(robcovsel)
+```
+
+```{r data generation}
+genevar = function(n = 100, p = 200, e = 0, r = 0.5, gamma = 10){
+  {
+    mu = rep(10,p)
+    sigma = diag(rep(5^2,p))
+    for (i in 1:p) {for (j in 1:p) {
+      if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
+  }
+  
+  {
+    xr = MASS::mvrnorm(n,mu,sigma)
+    beta = c(1,2,1,2,1,rep(0,p-5))
+    error = rnorm(n,0,1)
+    y = 20+xr%*%beta + error
+    bi = apply(matrix(0, nrow = n, ncol = p), 2, 
+               function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
+    
+    outlier = matrix(0,nrow = n,ncol=p)
+    for (i in 1:n) {
+      k = sum(bi[i,])
+      if(k!=0){
+        label = as.logical(bi[i,])
+        muc = mu[label]+sigma[label,!label]%*%solve(sigma[!label,!label])%*%(xr[i,!label]-mu[!label])
+        sigmac = sigma[label,label]-sigma[label,!label]%*%solve(sigma[!label,!label])%*%sigma[!label,label]
+        outlier[i,label] = muc-gamma*sign(xr[i,label])*diag(sigmac)
+      }
+    }
+    x = xr*(1-bi)+outlier
+  }
+  return(list(x = x, y = y))
+
+}
+
+gen = genevar()
+x = gen$x
+y = gen$y
+```
+
+```{r}
+system.time({fit = covlasso(x,y,cor.method = "pair",scale.method = "qn", pda.method = "nearpd")})  
+```
+
+
