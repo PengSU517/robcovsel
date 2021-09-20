@@ -2,5 +2,6 @@
 
 export(covf)
 export(covlasso)
+export(lminsel)
 export(nearpdf)
 export(paircorxyf)

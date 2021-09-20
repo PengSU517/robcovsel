@@ -15,18 +15,42 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+# remotes::install_github("PengSU517/robcovsel")
 library(robcovsel)
 library(doParallel)
+#detectCores()
+#registerDoParallel(cores=8)
+#getDoParWorkers()
+cs = makeCluster(4)
+registerDoParallel(cs)
+#stopCluster(cs)
 ```
 
 ```{r}
 ###### settings
 {
   ns = c(100)
-  ps = c(200)
-  es = c(0.02, 0.05,0.1)
-  gammas = (0:5)*2
+  ps = c(100)
+  es = c(0.02)
+  gammas = (5)*2
 }
+
+
+##### methods
+lassof = function(x,y){covlasso(x,y,cor.method = "pearson",scale.method = "sd", ada = F)$betahat_opt}
+sparseShootingSf = function(x,y){sparseshooting(x,y, maxIteration = 20)$coef[-1]}
+sltsf = function(x,y){fit = sparseLTS(x,y);fit$coefficients[-1]}
+gausslassof = function(x,y){covlasso(x,y,cor.method = "gaussrank", ada = T)$betahat_opt}
+nearpdafa = function(x,y){covlasso(x, y, ada = T)$betahat_opt}
+
+mtds = list(Lasso = lassof, 
+            sLTS = sltsf, 
+            #sShootingS = sparseShootingSf,
+            ALGR = gausslassof,
+            ALRP = nearpdafa
+      )
+
+
 #### measurements
 {
   msef<-function(betahat){mean(((betahat-beta))^2)}
@@ -34,80 +58,84 @@ library(doParallel)
   tpf<-function(betahat){sum((as.logical(betahat)==as.logical(beta))[1:5])}
   tnf<-function(betahat){sum((as.logical(betahat)==as.logical(beta))[-(1:5)])}
 }
+
+
 ```
 
 
 
 ```{r}
 system.time({
-  result = foreach(m = 1:2, .combine = "rbind", 
-                   .packages = c("MASS", "lars", "robustbase", "robustHD"))%:%
+  result = foreach(m = 1:8, .combine = "rbind", 
+                   .packages = c("MASS", "lars", "robustbase", "robustHD","robcovsel", "ShootingS"))%:%
     
     foreach(n = ns, .combine = "rbind")%:%
     foreach(p = ps, .combine = "rbind")%:%
     foreach(e = es, .combine = "rbind")%:%
-    foreach(gamma = gammas,.combine = "rbind")%do%{
-      {
-        r = 0.5 
-        mu = rep(0,p)
-        sigma = diag(rep(1^2,p))
-        for (i in 1:p) {for (j in 1:p) {
-          if (abs(i-j)!=0)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
-        xr = MASS::mvrnorm(n,mu,sigma)
-        beta = c(c(2,1,2,1,2),rep(0,p-5))
-      }
+    foreach(mtd = 1:length(mtds), .combine = "rbind")%:%
+    foreach(gamma = gammas,.combine = "rbind")%dopar%{
       
       {
-        error = rnorm(n,0,0.5)###the noise proportion is too large
-        y = xr%*%beta + error
-        bi = apply(matrix(0, nrow = n, ncol = p), 2, 
-                   function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
-        
-        outlier = matrix(0,nrow = n,ncol=p)
-        for (i in 1:n) {
-          k = sum(bi[i,])
-          if(k!=0){
-            label = as.logical(bi[i,])
-            muc = mu[label]+sigma[label,!label]%*%solve(sigma[!label,!label])%*%(xr[i,!label]-mu[!label])
-            sigmac = sigma[label,label]-sigma[label,!label]%*%solve(sigma[!label,!label])%*%sigma[!label,label]
-            outlier[i,label] = muc-gamma*sign(xr[i,label])*diag(sigmac)
-          }
+        {
+          r = 0.5 
+          mu = rep(0,p)
+          sigma = diag(rep(1^2,p))
+          for (i in 1:p) {for (j in 1:p) {
+            if (abs(i-j)!=0)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
+          beta = c(c(2,1,2,1,2),rep(0,p-5))
         }
-        x = xr*(1-bi)+outlier
+        {
+          xr = MASS::mvrnorm(n,mu,sigma)
+          error = rnorm(n,0,0.5)###the noise proportion is too large
+          y = xr%*%beta + error
+          bi = apply(matrix(0, nrow = n, ncol = p), 2, 
+                     function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
+  
+          outlier = matrix(rnorm(n = n*p, mean = gamma, sd = 1),nrow = n,ncol=p)
+          x = xr*(1-bi) + bi*outlier
+        }
       }
       
-      
-      lassof = function(x,y){covlasso(x,y,cor.method = "pearson",scale.method = "sd", ada = F)$betahat_opt}
-      sparseShootingSf = function(x,y){sparseshooting(x,y, maxIteration = 20)$coef[-1]}
-      sltsf = function(x,y){fit = sparseLTS(x,y);fit$coefficients[-1]}
-      gausslassof = function(x,y){covlasso(x,y,cor.method = "gaussrank", ada = T)$betahat_opt}
-      nearpdafa = function(x,y){covlasso(x, y, ada = T)$betahat_opt}
-      
-      mtds = list(Lasso = lassof, 
-                  sLTS = sltsf, 
-                  #sShootingS = sparseShootingSf,
-                  ALGR = gausslassof,
-                  ALRP = nearpdafa
-                  
-                  
-      )
-      
-      rst = NULL
-      for(mtd in 1:length(mtds)){
+      {
         betahat = mtds[[mtd]](x,y)
         mse = msef(betahat)
         mse5 = mse5f(betahat)
         tp = tpf(betahat)
         tn = tnf(betahat)
-        rst = rbind(rst, c(n = n, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd],  
-                           mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn))
+        rst = c(n = n, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd],  
+                           mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
       }
       rst
     }
 })
+```
+
+
+4 simu 4 core
+   user  system elapsed 
+   0.12    0.09    8.79 
+
+
+
+
+
+```{r}
 
 
 result = as.data.frame(result)
-readr::write_csv(result, "result_random_predictors.csv")
+#readr::write_csv(result, "result_random_predictors.csv")
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+   
+   

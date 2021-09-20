@@ -99,6 +99,9 @@ nearpdf = function(cormatrix, pda.method, lmin){
 #' Selection of the eigen value threshold
 #'
 #' @param cormatrix input cormatrix
+#' @return
+#' @export
+#'
 
 lminsel = function(cormatrix){
 

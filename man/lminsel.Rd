@@ -9,6 +9,9 @@ lminsel(cormatrix)
 \arguments{
 \item{cormatrix}{input cormatrix}
 }
+\value{
+
+}
 \description{
 Selection of the eigen value threshold
 }
