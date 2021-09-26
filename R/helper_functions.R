@@ -80,14 +80,14 @@ nearpdf = function(cormatrix, pda.method, lmin){
   if(is.null(lmin)){lmin = lminsel(cormatrix)}
 
   if(pda.method == "shrinkage"){
-    rst = eigen(cormatrix)
+    rst = eigen(cormatrix, EISPACK = T)
     delta = min(max((lmin - min(rst$values))/(1- min(rst$values)), 0),1)
     neweigen = delta + (1-delta)*rst$values
     cormatrix.pd = (rst$vectors)%*%diag(neweigen)%*%t(rst$vectors)
   }
 
   if(pda.method == "nearpd"){
-    rst = eigen(cormatrix)
+    rst = eigen(cormatrix, EISPACK = T)
     neweigen = pmax(rst$values, lmin)
     cormatrix.pd = (rst$vectors)%*%diag(neweigen)%*%t(rst$vectors)
   }
@@ -105,7 +105,7 @@ nearpdf = function(cormatrix, pda.method, lmin){
 
 lminsel = function(cormatrix){
 
-  rst = eigen(cormatrix)
+  rst = eigen(cormatrix, EISPACK = T)
   lossf = function(lmin, multi = 1){
     neweigen = pmax(rst$values, lmin)
     cormatrixnew = (rst$vectors)%*%diag(neweigen)%*%t(rst$vectors)
