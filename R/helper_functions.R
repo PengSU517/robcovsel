@@ -139,20 +139,21 @@ paircorxyf = function(x,y){
   return(cor)
 }
 
-#' generating predictors and response randomly based on given parameters
+#' generating predictors and response randomly using default settings
 #'
 #' @param n sample size
 #' @param p dimension
 #' @param e contamination rate
 #' @param r correlation coefficent
 #' @param gamma magnitude of outliers
+#' @param beta
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #'
-genevar = function(n = 100, p = 20, e = 0, r = 0.5, gamma = 10){
+genevar = function(n = 100, p = 20, e = 0, r = 0.5, beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10){
   {
     mu = rep(10,p)
     sigma = diag(rep(5^2,p))
@@ -162,7 +163,6 @@ genevar = function(n = 100, p = 20, e = 0, r = 0.5, gamma = 10){
 
   {
     xr = MASS::mvrnorm(n,mu,sigma)
-    beta = c(1,2,1,2,1,rep(0,p-5))
     error = rnorm(n,0,1)
     y = 20+xr%*%beta + error
     bi = apply(matrix(0, nrow = n, ncol = p), 2,
@@ -172,6 +172,6 @@ genevar = function(n = 100, p = 20, e = 0, r = 0.5, gamma = 10){
     outlier = matrix(outl*rsign, nrow = n, ncol=p)
     x = xr*(1-bi)+outlier
   }
-  return(list(x = x, y = y))
+  return(list(x = x, y = y, beta = beta))
 
 }

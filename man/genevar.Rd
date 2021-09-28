@@ -2,9 +2,16 @@
 % Please edit documentation in R/helper_functions.R
 \name{genevar}
 \alias{genevar}
-\title{generating predictors and response randomly based on given parameters}
+\title{generating predictors and response randomly using default settings}
 \usage{
-genevar(n = 100, p = 20, e = 0, r = 0.5, gamma = 10)
+genevar(
+  n = 100,
+  p = 20,
+  e = 0,
+  r = 0.5,
+  beta = c(1, 2, 1, 2, 1, rep(0, p - 5)),
+  gamma = 10
+)
 }
 \arguments{
 \item{n}{sample size}
@@ -15,13 +22,15 @@ genevar(n = 100, p = 20, e = 0, r = 0.5, gamma = 10)
 
 \item{r}{correlation coefficent}
 
+\item{beta}{}
+
 \item{gamma}{magnitude of outliers}
 }
 \value{
 
 }
 \description{
-generating predictors and response randomly based on given parameters
+generating predictors and response randomly using default settings
 }
 \examples{
 

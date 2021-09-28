@@ -15,136 +15,172 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# remotes::install_github("PengSU517/robcovsel")
-library(robcovsel)
-library(doParallel)
-#detectCores()
-#registerDoParallel(cores=8)
-#getDoParWorkers()
-cs = makeCluster(8)
-registerDoParallel(cs)
-#stopCluster(cs)
+#########system settings
+{
+  #remotes::install_github("PengSU517/robcovsel")
+  #library(robcovsel)
+  library(doParallel)
+  library(inline)
+  rm(list = ls()) # clean slate
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  detectCores()
+  registerDoParallel(cores=8)
+  getDoParWorkers()
+
+}
 ```
 
+```{r do not run this chunck on laptop}
+library(inline)
+openblas.set.num.threads <- cfunction( signature(ipt="integer"),
+                                         body = 'openblas_set_num_threads(*ipt);',
+                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
+                                         libargs = c ('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
+                                         language = "C",
+                                         convention = ".C")
+openblas.set.num.threads(1) # just call 1 core when using BLAS if you want to do parallel computation 
+```
+
+
 ```{r}
-###### settings
+###### data generation settings
 {
-  ns = c(100)
-  ps = c(200)
-  es = c(0.02, 0.05, 0.1)
-  gammas = (0:5)*2
+  ms = 1:1000
+  ps = c(20, 200)
+  es = c(0.02, 0.05, 0.1 )
+  gammas = seq(0, 10, 2)
+}
+
+
+{
+  m = 10
+  p = c(20)
+  e = c(0.02)
+  gamma = (5)*2
 }
 
 
 ##### methods
-lassof = function(x,y){covlasso(x,y,cor.method = "pearson",scale.method = "sd", ada = F)$betahat_opt}
-sparseShootingSf = function(x,y){sparseshooting(x,y, maxIteration = 20)$coef[-1]}
-sltsf = function(x,y){fit = sparseLTS(x,y);fit$coefficients[-1]}
-gausslassof = function(x,y){covlasso(x,y,cor.method = "gaussrank", ada = T)$betahat_opt}
-nearpdafa = function(x,y){covlasso(x, y, ada = T)$betahat_opt}
+{
+  lassof = function(x,y){covlasso(x,y,cor.method = "pearson",scale.method = "sd", ada = F)$betahat_opt}
+  sparseShootingSf = function(x,y){shootings::sparseshooting(x,y)$coef[-1]}
+  sltsf = function(x,y){fit = robustHD::sparseLTS(x,y);fit$coefficients[-1]}
+  algrf = function(x,y){covlasso(x,y,cor.method = "gaussrank", ada = T)$betahat_opt}
+  alrpf = function(x,y){covlasso(x, y, ada = T)$betahat_opt}
+  
+  mtds = list(Lasso = lassof, 
+              sLTS = sltsf, 
+              sShootingS = sparseShootingSf,
+              ALGR = algrf,
+              ALRP = alrpf
+  )
+}
 
-mtds = list(Lasso = lassof, 
-            sLTS = sltsf, 
-            sShootingS = sparseShootingSf,
-            ALGR = gausslassof,
-            ALRP = nearpdafa
-      )
 
 
 #### measurements
 {
-  msef<-function(betahat){mean(((betahat-beta))^2)}
-  mse5f<-function(betahat){mean(((betahat-beta)[1:5])^2)}
-  tpf<-function(betahat){sum((as.logical(betahat)==as.logical(beta))[1:5])}
-  tnf<-function(betahat){sum((as.logical(betahat)==as.logical(beta))[-(1:5)])}
+  msef<-function(betahat, beta){mean(((betahat-beta))^2)}
+  mse5f<-function(betahat, beta){mean(((betahat-beta)[1:5])^2)}
+  tpf<-function(betahat, beta){sum((as.logical(betahat)==as.logical(beta))[1:5])}
+  tnf<-function(betahat,beta){sum((as.logical(betahat)==as.logical(beta))[-(1:5)])}
 }
 
 
 ```
 
 
-
 ```{r}
+
 system.time({
-  result = foreach(m = 1:8, .combine = "rbind", 
-                   .packages = c("MASS", "lars", "robustbase", "robustHD","robcovsel", "shootings"))%:%
-    
-    foreach(n = ns, .combine = "rbind")%:%
+  result <- foreach(m = ms, .combine=cbind, 
+               .packages = c("robustHD","robcovsel", "shootings"))%:%
     foreach(p = ps, .combine = "rbind")%:%
     foreach(e = es, .combine = "rbind")%:%
-    foreach(mtd = 1:length(mtds), .combine = "rbind")%:%
-    foreach(gamma = gammas,.combine = "rbind")%dopar%{
+    foreach(gamma = gammas,.combine = "rbind")%dopar% {
       
-      {
-        {
-          r = 0.5 
-          mu = rep(0,p)
-          sigma = diag(rep(1^2,p))
-          for (i in 1:p) {for (j in 1:p) {
-            if (abs(i-j)!=0)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
-          beta = c(c(2,1,2,1,2),rep(0,p-5))
-        }
-        {
-          xr = MASS::mvrnorm(n,mu,sigma)
-          error = rnorm(n,0,0.5)###the noise proportion is too large
-          y = xr%*%beta + error
-          bi = apply(matrix(0, nrow = n, ncol = p), 2, 
-                     function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
-  
-          outlier = matrix(rnorm(n = n*p, mean = gamma, sd = 1),nrow = n,ncol=p)
-          x = xr*(1-bi) + bi*outlier
-        }
-      }
+      seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m)
+      set.seed(seed = seed)
       
-      {
+      dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
+      x = dataset$x
+      y = dataset$y
+      beta = dataset$beta
+
+      rst = list()
+      for (mtd in 1:length(mtds)) {
         betahat = mtds[[mtd]](x,y)
-        mse = msef(betahat)
-        mse5 = mse5f(betahat)
-        tp = tpf(betahat)
-        tn = tnf(betahat)
-        rst = c(n = n, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd],  
-                           mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
+        mse = msef(betahat, beta)
+        mse5 = mse5f(betahat, beta)
+        tp = tpf(betahat, beta)
+        tn = tnf(betahat, beta)
+        rst[[mtd]] = c(n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd],  
+                mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
       }
+      rst = t(as.data.frame(rst))
       rst
     }
 })
+
+
 ```
 
 
 
 ```{r}
 
-result = as.data.frame(result)
-readr::write_csv(test, "result_random_predictors_200.csv")
+rst = NULL
+nam = c("n", "p", "e", "gamma", "mtd","mse", "mse5", "tp", "fp" )
+for (i in 1:length(nam)){
+  vbl = as.vector(result[,which(colnames(result)==nam[i])])
+  rst = cbind(rst, vbl)
+}
+
+colnames(rst) = c("n", "p", "e", "gamma", "mtd","mse", "mse5", "tp", "fp" )
+readr::write_csv(as.data.frame(rst), "result_random_predictors_200_500rounds2.csv")
 
 ```
 
 
 ```{r analysis}
+########################## analysis
+
 library(tidyverse)
 library(gridExtra)
 library(grid)
 
 
+
+
 ####### 20 predictors
 result = as.data.frame(read_csv("result_random_predictors_20.csv")) 
 glimpse(result)
+result = result %>% mutate(fn = 5-tp, tn = 15-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)),
+                           mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))))
 
 summary = result %>% group_by(n,p,e,gamma,mtd) %>% summarise(
-  MSE = mean(mse, na.rm = T),MSE5 = mean(mse5, na.rm = T),TPR = mean(tp/5, na.rm = T),FPR = mean(fp/15, na.rm = T))
-summary = summary %>% mutate(mtd = factor(mtd, levels = c("Lasso", "sLTS", "sShootingS", "ALRP", "ALGR")))
+  MSE = mean(mse, na.rm = T),MSE5 = mean(mse5, na.rm = T),
+  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/15, na.rm = T), F1 = mean(f1), MCC = mean(mcc))
+summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "sShootingS", "sLTS","Lasso")))
 summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
 glimpse(summary)
 
 
-p1 = ggplot(data = summary, aes(x = gamma,y = MSE, color = mtd ))+geom_line()+geom_point()+facet_wrap(~e) +
+p1 = ggplot(data = summary, aes(x = gamma,y = F1, color = Method ))+geom_line()+geom_point()+facet_wrap(~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
-  labs(fill = "", x = expression(gamma*": magnitude of outlyingness"))+ 
+  labs(fill = "", x = expression(gamma*": magnitude of outlyingness"), y = expression(F[1]))+ 
   guides(fill = guide_legend(title = "Thresholds")) +
   theme_light() +
   theme(text= element_text(size=20))
 
-p2 = ggplot(data = summary, aes(x = gamma,y = TPR, color = mtd ))+geom_line()+geom_point()+ facet_wrap(~e) +
+p2 = ggplot(data = summary, aes(x = gamma,y = MCC, color = Method ))+geom_line()+geom_point()+facet_wrap(~e) +
+  scale_x_continuous(breaks=seq(0,12,2)) +
+  labs(fill = "", x = "")+ 
+  guides(fill = guide_legend(title = "Thresholds")) +
+  theme_light() +
+  theme(text= element_text(size=20))
+
+p3 = ggplot(data = summary, aes(x = gamma,y = TPR, color = Method ))+geom_line()+geom_point()+ facet_wrap(~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
@@ -152,7 +188,7 @@ p2 = ggplot(data = summary, aes(x = gamma,y = TPR, color = mtd ))+geom_line()+ge
   theme_light() +
   theme(text= element_text(size=20))
 
-p3 = ggplot(data = summary, aes(x = gamma,y = FPR, color = mtd ))+geom_line()+geom_point()+ facet_wrap(~e) +
+p4 = ggplot(data = summary, aes(x = gamma,y = FPR, color = Method ))+geom_line()+geom_point()+ facet_wrap(~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
@@ -191,10 +227,11 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 }
 
 
-pp20 = grid_arrange_shared_legend(p2,p3,p1,nrow = 3, ncol = 1, position = "bottom")
+pp20 = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
 pp20
 
 ggsave("plots_20.eps", plot = pp20, width = 10,height = 8)
+
 
 ```
 
