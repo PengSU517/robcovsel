@@ -45,19 +45,19 @@ openblas.set.num.threads(1) # just call 1 core when using BLAS if you want to do
 ```{r}
 ###### data generation settings
 {
-  ms = 1:1000
-  ps = c(20, 200)
-  es = c(0.02, 0.05, 0.1 )
+  ms = 1:2
+  ps = c(20)
+  es = c(0.02)
   gammas = seq(0, 10, 2)
 }
 
-
 {
-  m = 10
-  p = c(20)
-  e = c(0.02)
-  gamma = (5)*2
+  m = 1
+  p = 20
+  e = 0.02
+  gamma = 0
 }
+
 
 
 ##### methods
@@ -104,9 +104,10 @@ system.time({
       
       dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
       x = dataset$x
+      x[1]
       y = dataset$y
       beta = dataset$beta
-
+      
       rst = list()
       for (mtd in 1:length(mtds)) {
         betahat = mtds[[mtd]](x,y)
@@ -114,7 +115,7 @@ system.time({
         mse5 = mse5f(betahat, beta)
         tp = tpf(betahat, beta)
         tn = tnf(betahat, beta)
-        rst[[mtd]] = c(n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd],  
+        rst[[mtd]] = c(n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd], seed = seed, 
                 mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
       }
       rst = t(as.data.frame(rst))
@@ -235,10 +236,58 @@ ggsave("plots_20.eps", plot = pp20, width = 10,height = 8)
 
 ```
 
+```{r}
+set.seed(1111)
+{
+  p = 10## when it is larger, server and laptop have different results
+  r = 0.5
+  {
+    mu = rep(0,p)
+    sigma = diag(rep(5^2,p))
+    for (i in 1:p) {for (j in 1:p) {
+      if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
+  }
+}
+MASS::mvrnorm(100, mu, sigma)[1,1]
 
 
+```
 
 
+```{r}
+set.seed(1111)
+  {
+    n = 100
+    p = 20
+    r = 0.5
+    mu = rep(10,p)
+    sigma = diag(rep(5^2,p))
+    for (i in 1:p) {for (j in 1:p) {
+      if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
+  }
+
+  {
+    xr = MASS::mvrnorm(n,mu,sigma)
+  }
+  
+xr[1]
+
+
+```
+
+
+```{r}
+set.seed(1111)
+n <- 100
+R <- matrix(c(1, 0.5,
+              0.5, 1), 
+            nrow = 2, ncol = 2)
+
+mu <- c(X = 0, Y = 0)
+mvtnorm::rmvnorm(n, mean = mu, sigma = R)[1,1]
+MASS::mvrnorm(n, mu = mu, Sigma = R)[1,1]
+
+```
 
 
 
