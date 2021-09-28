@@ -9,7 +9,7 @@ covlasso(
   y,
   cor.method = "pair",
   scale.method = "qn",
-  pda.method = "nearpd",
+  pda.method = NULL,
   lmin = NULL,
   std = T,
   adaptive = T,
@@ -34,6 +34,10 @@ covlasso(
 if FALSE the robust covariance matrix is used.}
 
 \item{adaptive}{adaptive regularization penalties}
+
+\item{cormatrix}{you could also use a correlation matrix as input}
+
+\item{scale}{put in scales if you use cormatrix}
 }
 \value{
 

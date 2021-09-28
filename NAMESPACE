@@ -2,6 +2,7 @@
 
 export(covf)
 export(covlasso)
+export(genevar)
 export(lminsel)
 export(nearpdf)
 export(paircorxyf)

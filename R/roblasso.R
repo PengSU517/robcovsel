@@ -9,13 +9,14 @@
 #' @param std If TRUE the robust correlation matrix is used,
 #'   if FALSE the robust covariance matrix is used.
 #' @param adaptive adaptive regularization penalties
+#' @param cormatrix you could also use a correlation matrix as input
+#' @param scale put in scales if you use cormatrix
 #'
 #' @return
 #' @export
 #'
 
-
-covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method = "nearpd",
+covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method = NULL,
                     lmin = NULL, std = T, adaptive = T, cormatrix = NULL, scale = NULL){
 
   x = as.matrix(x)
@@ -23,6 +24,12 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
 
   n = dim(x)[1]
   p = dim(x)[2]
+
+  if(is.null(pda.method)){
+    if((cor.method == "pair")|(p>(0.5*n))){pda.method = "nearpd"}else{
+      pda.method = F
+    }
+  }
 
   if(is.null(cormatrix)){
     rst = covf(data, cor.method, scale.method, pda.method, lmin)
@@ -69,7 +76,6 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
 
   penal = apply(betahat, 2, function(betahat){sum(as.logical(betahat))})
   bic = n*log(sigma2hat) + (penal) * log(n)
-  ebic = n*log(sigma2hat) + (penal) * log(log(n))/n
 
   betahat = t(betahat)
 
@@ -79,7 +85,10 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
   betahat_opt = betahat[label,]
   sigma2hat_opt = sigma2hat[label]
 
-  list(lambda = lambda, betahat = betahat, sigma2hat = sigma2hat, bic = bic, ebic = ebic,
-       covmatrix = covmatrix, cormatrix = cormatrix, lmin = lmin,
+  list(lambda = lambda, betahat = betahat, sigma2hat = sigma2hat, bic = bic,
+       covmatrix = covmatrix, cormatrix = cormatrix, scale = scale,
+       cor.method = cor.method, scale.method = scale.method, pda.method = pda.method,
+       lmin = lmin, std = std, adaptive = adaptive,
+
        lambda_opt = lambda_opt, betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
 }
