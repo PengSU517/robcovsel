@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 }
 ```
 
-```{r do not run this chunck on laptop}
+```{r do not run this chunck on a laptop}
 library(inline)
 openblas.set.num.threads <- cfunction( signature(ipt="integer"),
                                          body = 'openblas_set_num_threads(*ipt);',
@@ -104,7 +104,6 @@ system.time({
       
       dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
       x = dataset$x
-      x[1]
       y = dataset$y
       beta = dataset$beta
       
@@ -138,7 +137,7 @@ for (i in 1:length(nam)){
 }
 
 colnames(rst) = c("n", "p", "e", "gamma", "mtd","mse", "mse5", "tp", "fp" )
-readr::write_csv(as.data.frame(rst), "result_random_predictors_200_500rounds2.csv")
+readr::write_csv(as.data.frame(rst), "result_random_predictors.csv")
 
 ```
 
@@ -154,7 +153,7 @@ library(grid)
 
 
 ####### 20 predictors
-result = as.data.frame(read_csv("result_random_predictors_20.csv")) 
+result = as.data.frame(read_csv("result_random_predictors.csv")) 
 glimpse(result)
 result = result %>% mutate(fn = 5-tp, tn = 15-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)),
                            mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))))
@@ -249,6 +248,7 @@ set.seed(1111)
   }
 }
 MASS::mvrnorm(100, mu, sigma)[1,1]
+mvtnorm::rmvnorm(100, mean = mu, sigma = sigma)[1,1]
 
 
 ```

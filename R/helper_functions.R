@@ -162,7 +162,7 @@ genevar = function(n = 100, p = 20, e = 0, r = 0.5, beta = c(1,2,1,2,1,rep(0,p-5
   }
 
   {
-    xr = MASS::mvrnorm(n,mu,sigma)
+    xr = mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
     error = rnorm(n,0,1)
     y = 20+xr%*%beta + error
     bi = apply(matrix(0, nrow = n, ncol = p), 2,
