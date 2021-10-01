@@ -153,18 +153,18 @@ paircorxyf = function(x,y){
 #'
 #' @examples
 #'
-genevar = function(n = 100, p = 20, e = 0, r = 0.5, beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10){
+genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10){
   {
-    mu = rep(10,p)
-    sigma = diag(rep(5^2,p))
+    mu = rep(0,p)
+    sigma = diag(rep(1^2,p))
     for (i in 1:p) {for (j in 1:p) {
       if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
   }
 
   {
     xr = mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
-    error = rnorm(n,0,1)
-    y = 20+xr%*%beta + error
+    error = rnorm(n,0,0.5)
+    y = xr%*%beta + error
     bi = apply(matrix(0, nrow = n, ncol = p), 2,
                function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
     outl = rnorm(n = n*p, mean = gamma, sd = 1)
