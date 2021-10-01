@@ -170,8 +170,16 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, beta = c(1,2,1,2,1,rep(0,
     outl = rnorm(n = n*p, mean = gamma, sd = 1)
     rsign = sample(c(-1,1), size = n*p, replace = T)
     outlier = matrix(outl*rsign, nrow = n, ncol=p)
-    x = xr*(1-bi)+outlier
+    x = xr*(1-bi)+outlier*bi
   }
   return(list(x = x, y = y, beta = beta))
 
+
 }
+
+
+
+
+
+
+
