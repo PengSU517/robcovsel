@@ -1,0 +1,68 @@
+---
+title: "breastcancer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{breastcancer}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#remotes::install_github("PengSU517/robcovsel")
+#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
+#this shootings package is constructed based on ineswilms/sparse-shooting-S
+library(robcovsel)
+library(tidyverse)
+library(robustHD) #sparse LTS
+library(shootings) # sparse shooting S
+library(cellWise)
+library(corrplot)
+
+rm(list = ls()) # clean slate
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+
+```{r analysis}
+y = breastcancer_screened$dat.surtime
+x = breastcancer_screened[,c(-1,-2)]
+
+corrs = covf(as.matrix(x), scale.method = "qn", cor.method = "pair", pda.method = F)$cormatrix
+corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
+
+
+fit1 <- DDC(x)
+cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
+        rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)
+#ggsave("breastcancer.eps",width = 12,height = 6)
+
+x = x[,sort(names(x))]
+
+lassofit = covlasso(x,y,cor.method = "pearson", scale.method = "sd", adaptive = F)
+sLTSfit = sparseLTS(x,y)
+sssfit = sparseshooting(as.matrix(x),y)
+pairfit = covlasso(x,y,cor.method = "pair", scale.method = "qn",adaptive = T)
+gaussrankfit = covlasso(x,y,cor.method = "gaussrank", scale.method = "qn", adaptive = T)
+
+rst = t(plyr::rbind.fill(list(
+  lasso = data.frame(t(sort(names(x)[as.logical(lassofit$betahat_opt)]))),
+  slts = data.frame(t(sort(names(x)[as.logical(sLTSfit$coefficients[-1])]))),
+  sss = data.frame(t(sort(names(x)[as.logical(sssfit$coef[-1])]))),
+  gaussrank = data.frame(t(sort(names(x)[as.logical(gaussrankfit$betahat_opt)]))),
+  pair = data.frame(t(sort(names(x)[as.logical(pairfit$betahat_opt)])))
+)))
+
+colnames(rst) = c("Lasso", "sLTS", "sShootingS", "ALGR", "ALRP")
+
+save(rst,"breastcancer_result.Rdata")
+```
+
+
+

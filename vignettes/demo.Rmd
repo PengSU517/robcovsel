@@ -15,7 +15,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+#remotes::install_github("PengSU517/robcovsel")
+#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
+#this shootings package is constructed based on ineswilms/sparse-shooting-S
 library(robcovsel)
+library(shootings)
 ```
 
 ```{r data generation}
@@ -27,6 +31,7 @@ y = gen$y
 ```{r}
 system.time({fit1 = covlasso(x,y,cor.method = "pair",scale.method = "qn")})  
 system.time({fit2 = covlasso(x,y,cor.method = "gaussrank",scale.method = "qn")})
+system.time({fit3 = sparseshooting(x,y) })
 
 fit1$pda.method
 fit1$adaptive

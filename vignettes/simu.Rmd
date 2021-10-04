@@ -16,48 +16,39 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 #########system settings
-{
-  #remotes::install_github("PengSU517/robcovsel")
-  #library(robcovsel)
-  library(doParallel)
-  library(inline)
-  rm(list = ls()) # clean slate
-  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-  detectCores()
-  registerDoParallel(cores=8)
-  getDoParWorkers()
-
-}
+#remotes::install_github("PengSU517/robcovsel")
+library(robcovsel)
+#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
+#this shootings package is constructed based on ineswilms/sparse-shooting-S
+rm(list = ls()) # clean slate
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 
-```{r do not run this chunck on a laptop}
-library(inline)
-openblas.set.num.threads <- cfunction( signature(ipt="integer"),
-                                         body = 'openblas_set_num_threads(*ipt);',
-                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
-                                         libargs = c ('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
-                                         language = "C",
-                                         convention = ".C")
-openblas.set.num.threads(1) # just call 1 core when using BLAS if you want to do parallel computation 
+```{r parallel computation settings}
+library(doParallel)
+registerDoParallel(cores=8)
+getDoParWorkers()
+
+# to prevent automatic parallel computation when doing linear algebra (OpenBLAS)
+#library(inline)
+#openblas.set.num.threads <- cfunction( signature(ipt="integer"),
+#                                         body = 'openblas_set_num_threads(*ipt);',
+#                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
+#                                         libargs = c #('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
+#                                         language = "C",
+#                                         convention = ".C")
+#openblas.set.num.threads(1) 
 ```
 
 
 ```{r}
 ###### data generation settings
 {
-  ms = 1:2
-  ps = c(20)
-  es = c(0.02)
+  ms = 1:1000
+  ps = 10 # ps = 200 in high dimensional settings
+  es = c(0.02, 0.05, 0.1)
   gammas = seq(0, 10, 2)
 }
-
-{
-  m = 1
-  p = 20
-  e = 0.02
-  gamma = 0
-}
-
 
 
 ##### methods
@@ -76,8 +67,6 @@ openblas.set.num.threads(1) # just call 1 core when using BLAS if you want to do
   )
 }
 
-
-
 #### measurements
 {
   msef<-function(betahat, beta){mean(((betahat-beta))^2)}
@@ -91,55 +80,50 @@ openblas.set.num.threads(1) # just call 1 core when using BLAS if you want to do
 
 
 ```{r}
-
-system.time({
-  result <- foreach(m = ms, .combine=cbind, 
-               .packages = c("robustHD","robcovsel", "shootings"))%:%
-    foreach(p = ps, .combine = "rbind")%:%
-    foreach(e = es, .combine = "rbind")%:%
-    foreach(gamma = gammas,.combine = "rbind")%dopar% {
-      
-      seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m)
-      set.seed(seed = seed)
-      
-      dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
-      x = dataset$x
-      y = dataset$y
-      beta = dataset$beta
-      
-      rst = list()
-      for (mtd in 1:length(mtds)) {
-        betahat = mtds[[mtd]](x,y)
-        mse = msef(betahat, beta)
-        mse5 = mse5f(betahat, beta)
-        tp = tpf(betahat, beta)
-        tn = tnf(betahat, beta)
-        rst[[mtd]] = c(n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd], seed = seed, 
-                mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
+{
+  systemtime = system.time({
+    result <- foreach(m = ms, 
+                      .packages = c("robustHD","robcovsel", "shootings"))%:%
+      foreach(p = ps)%:%
+      foreach(e = es)%:%
+      foreach(gamma = gammas)%dopar% {
+        
+        seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m)
+        set.seed(seed = seed)
+        
+        dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
+        #dataset = genevar(e = 0.1, gamma = 3)
+        x = dataset$x
+        y = dataset$y
+        #plot(x[,1:2])
+        #if(seed==1111){y = c(y,1)}
+        beta = dataset$beta
+        
+        rst = list(lasso = NULL, slts = NULL, sss = NULL, algr = NULL, alrp = NULL)
+        for (mtd in 1:length(mtds)) {
+          try({
+            betahat = mtds[[mtd]](x,y)
+            mse = msef(betahat, beta)
+            mse5 = mse5f(betahat, beta)
+            tp = tpf(betahat, beta)
+            tn = tnf(betahat, beta)
+            rst[[mtd]] = c(m = m, n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd], seed =seed,  
+                           mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
+          }, TRUE
+          )
+          if(is.null(rst[[mtd]])){rst[[mtd]]=rep(NA, 11)}
+        }
+        rst
       }
-      rst = t(as.data.frame(rst))
-      rst
-    }
-})
-
-
-```
-
-
-
-```{r}
-
-rst = NULL
-nam = c("n", "p", "e", "gamma", "mtd","mse", "mse5", "tp", "fp" )
-for (i in 1:length(nam)){
-  vbl = as.vector(result[,which(colnames(result)==nam[i])])
-  rst = cbind(rst, vbl)
+  })
+  
+  
+  
+  #save(result, file = "result_simu_p200.RData")
 }
-
-colnames(rst) = c("n", "p", "e", "gamma", "mtd","mse", "mse5", "tp", "fp" )
-readr::write_csv(as.data.frame(rst), "result_random_predictors.csv")
-
 ```
+
+
 
 
 ```{r analysis}
@@ -150,17 +134,17 @@ library(gridExtra)
 library(grid)
 
 
+result1 = as.data.frame(t(as.data.frame(result)))
+result1 = result1[complete.cases(result1),]
 
+glimpse(result1)
+result1 = result1 %>% mutate(tp = as.numeric(tp), fp = as.numeric(fp), gamma = as.numeric(gamma), p = as.numeric(p),
+                           fn = 5-tp, tn = p-5-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn))#,
+                           #mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)))
+                           )
 
-####### 20 predictors
-result = as.data.frame(read_csv("result_random_predictors.csv")) 
-glimpse(result)
-result = result %>% mutate(fn = 5-tp, tn = 15-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)),
-                           mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))))
-
-summary = result %>% group_by(n,p,e,gamma,mtd) %>% summarise(
-  MSE = mean(mse, na.rm = T),MSE5 = mean(mse5, na.rm = T),
-  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/15, na.rm = T), F1 = mean(f1), MCC = mean(mcc))
+summary = result1 %>% group_by(n,p,e,gamma,mtd) %>% summarise(
+  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/(p-5), na.rm = T), F1 = mean(f1))%>%ungroup()
 summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "sShootingS", "sLTS","Lasso")))
 summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
 glimpse(summary)
@@ -220,75 +204,19 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
   
   grid.newpage()
   grid.draw(combined)
-  
   # return gtable invisibly
   invisible(combined)
   
 }
 
 
-pp20 = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
-pp20
-
-ggsave("plots_20.eps", plot = pp20, width = 10,height = 8)
-
-
+pp = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
+#ggsave("plots_200.eps", plot = pp, width = 10,height = 8)
 ```
 
-```{r}
-set.seed(1111)
-{
-  p = 10## when it is larger, server and laptop have different results
-  r = 0.5
-  {
-    mu = rep(0,p)
-    sigma = diag(rep(5^2,p))
-    for (i in 1:p) {for (j in 1:p) {
-      if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
-  }
-}
-MASS::mvrnorm(100, mu, sigma)[1,1]
-mvtnorm::rmvnorm(100, mean = mu, sigma = sigma)[1,1]
-
-
+```{r, fig.width=10, fig.height=10}
+pp
 ```
-
-
-```{r}
-set.seed(1111)
-  {
-    n = 100
-    p = 20
-    r = 0.5
-    mu = rep(10,p)
-    sigma = diag(rep(5^2,p))
-    for (i in 1:p) {for (j in 1:p) {
-      if (i !=j)sigma[i,j] = sqrt(sigma[i,i]*sigma[j,j])*r^abs(i-j)}}
-  }
-
-  {
-    xr = MASS::mvrnorm(n,mu,sigma)
-  }
-  
-xr[1]
-
-
-```
-
-
-```{r}
-set.seed(1111)
-n <- 100
-R <- matrix(c(1, 0.5,
-              0.5, 1), 
-            nrow = 2, ncol = 2)
-
-mu <- c(X = 0, Y = 0)
-mvtnorm::rmvnorm(n, mean = mu, sigma = R)[1,1]
-MASS::mvrnorm(n, mu = mu, Sigma = R)[1,1]
-
-```
-
 
 
 
