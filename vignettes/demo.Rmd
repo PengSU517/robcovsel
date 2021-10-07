@@ -23,7 +23,7 @@ library(shootings)
 ```
 
 ```{r data generation}
-gen = genevar(p = 10e = 0.1)
+gen = genevar(p = 10, e = 0.1)
 x = gen$x
 y = gen$y
 ```
