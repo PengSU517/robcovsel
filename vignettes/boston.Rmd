@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 #remotes::install_github("PengSU517/robcovsel")
 #remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
-#this shootings package is constructed based on ineswilms/sparse-shooting-S
+#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
 library(MASS) # the Boston dataset
 library(robcovsel)
 library(tidyverse)
