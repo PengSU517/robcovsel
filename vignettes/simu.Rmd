@@ -80,6 +80,7 @@ getDoParWorkers()
 
 
 ```{r}
+version = 0
 {
   systemtime = system.time({
     result <- foreach(m = ms, 
@@ -88,7 +89,7 @@ getDoParWorkers()
       foreach(e = es)%:%
       foreach(gamma = gammas)%dopar% {
         
-        seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m)
+        seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m) + version 
         set.seed(seed = seed)
         
         dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
@@ -111,7 +112,10 @@ getDoParWorkers()
                            mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
           }, TRUE
           )
-          if(is.null(rst[[mtd]])){rst[[mtd]]=rep(NA, 11)}
+          if(is.null(rst[[mtd]])){# this part is just used to debug
+            rst[[mtd]]=rep(NA, 11)
+            save(seed, mtd, dataset, file = paste(mtd, "testerrordata", seed, ".RData", sep = ""))
+          }
         }
         rst
       }

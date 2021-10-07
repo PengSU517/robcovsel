@@ -57,7 +57,7 @@ system.time({result = foreach(m = 1:1000, .combine = "rbind",
       for (i in 1:pr) {for (j in 1:pr) {
         if (i !=j)sigmar[i,j] = sqrt(sigmar[i,i]*sigmar[j,j])*r^abs(i-j)}}
       xr = MASS::mvrnorm(n,mur,sigmar)
-      x = cbind(robustHD::standardize(predictors, centerFun = median,  scaleFun = robustbase::Qn), xr)
+      x = robustHD::robStandardize(cbind(predictors, xr), centerFun = median,  scaleFun = robustbase::Qn)
       p = dim(x)[2]
       
       gamma = 10
@@ -72,11 +72,10 @@ system.time({result = foreach(m = 1:1000, .combine = "rbind",
     }
 
     {
-      lassofit = covlasso(xx,yy,cor.method = "pearson", scale.method = "sd", 
-                          pda.method = F, adaptive = F)$betahat_opt
+      lassofit = covlasso(xx,yy,cor.method = "pearson", scale.method = "sd", pda.method = F, adaptive = F)$betahat_opt
       sLTSfit = sparseLTS(xx,yy)$coefficients[-1]
       sssfit = sparseshooting(xx,yy)$coef[-1]
-      pairfit = covlasso(xx,yy,cor.method = "pair",scale.method = "qn")$betahat_opt
+      pairfit = covlasso(xx,yy)$betahat_opt
       gaussrankfit = covlasso(xx,yy,cor.method = "gaussrank")$betahat_opt
       
       rst = rbind(e = e, m = m, cbind(lassofit, sLTSfit,sssfit, pairfit, gaussrankfit))

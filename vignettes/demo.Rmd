@@ -23,7 +23,7 @@ library(shootings)
 ```
 
 ```{r data generation}
-gen = genevar(e = 0.1)
+gen = genevar(p = 10e = 0.1)
 x = gen$x
 y = gen$y
 ```
@@ -31,12 +31,13 @@ y = gen$y
 ```{r}
 system.time({fit1 = covlasso(x,y,cor.method = "pair",scale.method = "qn")})  
 system.time({fit2 = covlasso(x,y,cor.method = "gaussrank",scale.method = "qn")})
-system.time({fit3 = sparseshooting(x,y) })
+system.time({fit3 = sparseshooting(x,y)})
 
-fit1$pda.method
-fit1$adaptive
-fit1$lmin
-head(fit1$betahat_opt)
+summary(lm(y~x))
+lm(y~x)$coe[-1]
+cov(y)-t(cov(x,y))%*%MASS::ginv(cov(x))%*%cov(x,y)
+tail(covlasso(x,y,cor.method = "pearson",scale.method = "sd", pda.method = F)$betahat,1)
+
 ```
 
 
