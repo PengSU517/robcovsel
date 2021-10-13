@@ -25,8 +25,8 @@ library(shootings) # sparse shooting S
 library(cellWise)
 library(corrplot)
 
-rm(list = ls()) # clean slate
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# rm(list = ls()) # clean slate
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 
 
@@ -61,7 +61,7 @@ rst = t(plyr::rbind.fill(list(
 
 colnames(rst) = c("Lasso", "sLTS", "sShootingS", "ALGR", "ALRP")
 
-save(rst,"breastcancer_result.Rdata")
+# save(rst,"breastcancer_result.Rdata")
 ```
 
 
