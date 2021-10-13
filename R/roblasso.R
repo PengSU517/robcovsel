@@ -14,6 +14,12 @@
 #'
 #' @return
 #' @export
+#' @examples
+#' dat = genevar()
+#' y = dat$y
+#' x = dat$x
+#' fit = covlasso(x,y)
+#' fit$betahat_opt
 #'
 
 covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method = NULL,
