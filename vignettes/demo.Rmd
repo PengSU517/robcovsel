@@ -22,16 +22,18 @@ library(robcovsel)
 library(shootings)
 ```
 
+# Data generation 
 ```{r data generation}
 gen = genevar(p = 10, e = 0.1)
 x = gen$x
 y = gen$y
 ```
 
+# test
 ```{r}
-system.time({fit1 = covlasso(x,y,cor.method = "pair",scale.method = "qn")})  
-system.time({fit2 = covlasso(x,y,cor.method = "gaussrank",scale.method = "qn")})
-system.time({fit3 = sparseshooting(x,y)})
+system.time({fit1 = covlasso(x,y,cor.method = "pair",scale.method = "qn")})  #ALRP
+system.time({fit2 = covlasso(x,y,cor.method = "gaussrank",scale.method = "qn")})#ALGR
+system.time({fit3 = sparseshooting(x,y)})#sparse shooting S
 
 summary(lm(y~x))
 lm(y~x)$coe[-1]
