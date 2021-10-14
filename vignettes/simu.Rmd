@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 
 #https://pengsu517.github.io/robcovsel
@@ -23,8 +24,8 @@ knitr::opts_chunk$set(
 library(robcovsel)
 #remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
 #This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
-rm(list = ls()) # clean slate
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# rm(list = ls()) # clean slate
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 
 ```{r parallel computation settings}
