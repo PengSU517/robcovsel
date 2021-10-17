@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Robust adaptive lasso — covlasso • robcovsel</title>
+<title>Robust adaptive lasso based on robust correlation estimates — covlasso • robcovsel</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Robust adaptive lasso — covlasso" />
-<meta property="og:description" content="Robust adaptive lasso" />
+<meta property="og:title" content="Robust adaptive lasso based on robust correlation estimates — covlasso" />
+<meta property="og:description" content="Robust adaptive lasso based on robust correlation estimates" />
 
 
 
@@ -124,13 +124,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Robust adaptive lasso</h1>
+    <h1>Robust adaptive lasso based on robust correlation estimates</h1>
     
     <div class="hidden name"><code>covlasso.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Robust adaptive lasso</p>
+    <p>Robust adaptive lasso based on robust correlation estimates</p>
     </div>
 
     <pre class="usage"><span class='fu'>covlasso</span><span class='op'>(</span>
@@ -194,10 +194,20 @@ if FALSE the robust covariance matrix is used.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
+    <p>betahat_opt, the optimal estimation of beta obtained from this algorithm</p>
+<p>lambda_opt is the optimal tuning parameter and sigma_opt is the optimal estimation of sigma.</p>
+<p>The output also includes the estimated correlation matrix, the estimated covariance matrix and et cetera from the covf function.</p>
 
-
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>dat</span> <span class='op'>=</span> <span class='fu'><a href='genevar.html'>genevar</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>y</span>
+<span class='va'>x</span> <span class='op'>=</span> <span class='va'>dat</span><span class='op'>$</span><span class='va'>x</span>
+<span class='va'>fit</span> <span class='op'>=</span> <span class='fu'>covlasso</span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span>
+<span class='va'>fit</span><span class='op'>$</span><span class='va'>betahat_opt</span>
+</div><div class='output co'>#&gt;  [1] 0.7175245 1.3139470 1.3813162 1.1393393 0.7682718 0.0000000 0.0000000
+#&gt;  [8] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000
+#&gt; [15] 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

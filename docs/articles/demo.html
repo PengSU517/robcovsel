@@ -111,13 +111,13 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>  <span class="co">#ALRP</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;    0.05    0.00    0.06</span>
+<span class="co">#&gt;    0.05    0.01    0.07</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit2</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="co">#ALGR</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;       0       0       0</span>
+<span class="co">#&gt;    0.01    0.00    0.01</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit3</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="co">#sparse shooting S</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;    1.01    0.05    1.06</span>
+<span class="co">#&gt;    3.93    0.10    4.04</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; </span>
@@ -126,40 +126,40 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Residuals:</span>
 <span class="co">#&gt;      Min       1Q   Median       3Q      Max </span>
-<span class="co">#&gt; -12.5840  -2.4116   0.1038   2.5869  11.4221 </span>
+<span class="co">#&gt; -13.4120  -2.1355  -0.0745   2.6851   9.3380 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span>
-<span class="co">#&gt; (Intercept)  0.41079    0.44863   0.916   0.3623    </span>
-<span class="co">#&gt; x1           0.09653    0.13575   0.711   0.4789    </span>
-<span class="co">#&gt; x2           0.68574    0.13666   5.018 2.66e-06 ***</span>
-<span class="co">#&gt; x3           0.22487    0.14138   1.591   0.1153    </span>
-<span class="co">#&gt; x4           0.20096    0.13323   1.508   0.1350    </span>
-<span class="co">#&gt; x5           0.14532    0.13586   1.070   0.2877    </span>
-<span class="co">#&gt; x6           0.38185    0.13806   2.766   0.0069 ** </span>
-<span class="co">#&gt; x7          -0.08811    0.13459  -0.655   0.5144    </span>
-<span class="co">#&gt; x8           0.07515    0.13672   0.550   0.5839    </span>
-<span class="co">#&gt; x9          -0.02864    0.14550  -0.197   0.8444    </span>
-<span class="co">#&gt; x10          0.09087    0.14328   0.634   0.5276    </span>
+<span class="co">#&gt;              Estimate Std. Error t value Pr(&gt;|t|)  </span>
+<span class="co">#&gt; (Intercept) -0.560595   0.419921  -1.335   0.1853  </span>
+<span class="co">#&gt; x1           0.001875   0.133633   0.014   0.9888  </span>
+<span class="co">#&gt; x2           0.144389   0.133338   1.083   0.2818  </span>
+<span class="co">#&gt; x3           0.280272   0.137843   2.033   0.0450 *</span>
+<span class="co">#&gt; x4           0.345303   0.142396   2.425   0.0173 *</span>
+<span class="co">#&gt; x5           0.015219   0.130046   0.117   0.9071  </span>
+<span class="co">#&gt; x6           0.123071   0.127064   0.969   0.3354  </span>
+<span class="co">#&gt; x7           0.256944   0.139388   1.843   0.0686 .</span>
+<span class="co">#&gt; x8          -0.175958   0.139822  -1.258   0.2115  </span>
+<span class="co">#&gt; x9          -0.129883   0.130713  -0.994   0.3231  </span>
+<span class="co">#&gt; x10         -0.076777   0.128822  -0.596   0.5527  </span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Residual standard error: 4.314 on 89 degrees of freedom</span>
-<span class="co">#&gt; Multiple R-squared:  0.3476, Adjusted R-squared:  0.2743 </span>
-<span class="co">#&gt; F-statistic: 4.742 on 10 and 89 DF,  p-value: 1.959e-05</span>
+<span class="co">#&gt; Residual standard error: 4.111 on 89 degrees of freedom</span>
+<span class="co">#&gt; Multiple R-squared:  0.1952, Adjusted R-squared:  0.1047 </span>
+<span class="co">#&gt; F-statistic: 2.158 on 10 and 89 DF,  p-value: 0.02771</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">coe</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>
-<span class="co">#&gt;          x1          x2          x3          x4          x5          x6 </span>
-<span class="co">#&gt;  0.09653461  0.68573599  0.22486951  0.20096067  0.14531829  0.38184933 </span>
-<span class="co">#&gt;          x7          x8          x9         x10 </span>
-<span class="co">#&gt; -0.08810687  0.07515267 -0.02864351  0.09086525</span>
+<span class="co">#&gt;           x1           x2           x3           x4           x5           x6 </span>
+<span class="co">#&gt;  0.001874802  0.144389352  0.280272182  0.345302696  0.015218948  0.123071205 </span>
+<span class="co">#&gt;           x7           x8           x9          x10 </span>
+<span class="co">#&gt;  0.256944344 -0.175958000 -0.129883185 -0.076776803</span>
 <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">%*%</span><span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/ginv.html">ginv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">%*%</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>
 <span class="co">#&gt;          [,1]</span>
-<span class="co">#&gt; [1,] 16.73144</span>
+<span class="co">#&gt; [1,] 15.19068</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>,scale.method <span class="op">=</span> <span class="st">"sd"</span>, pda.method <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">betahat</span>,<span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt;          [,1]     [,2]      [,3]      [,4]      [,5]      [,6]        [,7]</span>
-<span class="co">#&gt; 10 0.09653461 0.685736 0.2248695 0.2009607 0.1453183 0.3818493 -0.08810687</span>
-<span class="co">#&gt;          [,8]        [,9]      [,10]</span>
-<span class="co">#&gt; 10 0.07515267 -0.02864351 0.09086525</span></code></pre></div>
+<span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]       [,5]      [,6]      [,7]</span>
+<span class="co">#&gt; 10 0.001874802 0.1443894 0.2802722 0.3453027 0.01521895 0.1230712 0.2569443</span>
+<span class="co">#&gt;         [,8]       [,9]      [,10]</span>
+<span class="co">#&gt; 10 -0.175958 -0.1298832 -0.0767768</span></code></pre></div>
 </div>
   </div>
 
