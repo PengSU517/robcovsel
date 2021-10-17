@@ -22,16 +22,24 @@ genevar(
 
 \item{r}{correlation coefficent}
 
-\item{beta}{}
+\item{beta}{regression coefficients}
 
 \item{gamma}{magnitude of outliers}
 }
 \value{
+x, the generated design matrix
 
+y, the generated response vector
+
+beta, the regression coefficients we use
 }
 \description{
 generating predictors and response randomly using default settings
 }
 \examples{
+
+dat = genevar()
+x = dat$x
+y = dat$y
 
 }

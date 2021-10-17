@@ -11,10 +11,12 @@ nearpdf(cormatrix, pda.method, lmin)
 
 \item{pda.method}{"nearpd" or FALSE}
 
-\item{lmin}{min threshold of eigenvalues}
+\item{lmin}{the min threshold of eigenvalues}
 }
 \value{
+cormatrix.pd, the positive-definite adjusted correlation matrix
 
+lmin, the min threshold of eigenvalues
 }
 \description{
 PD calibration

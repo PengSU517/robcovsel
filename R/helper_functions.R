@@ -8,8 +8,13 @@
 #' @param lmin min threshold of eigenvalues
 #'
 #'
-#' @return
+#' @return covmatrix, the estimated covariance matrix
+#' @return cormatrix, the estimated correlation matrix
+#' @return scale, the estimated scale vector
+#' @return lmin, the min threshold of eigenvalues
 #' @export
+#'
+#'
 #'
 #' @examples
 #' x = matrix(rnorm(100), ncol = 10)
@@ -65,10 +70,11 @@ covf = function(x, cor.method, scale.method, pda.method, lmin = NULL){
 #'
 #' @param cormatrix input cormatrix
 #' @param pda.method "nearpd" or FALSE
-#' @param lmin min threshold of eigenvalues
+#' @param lmin the min threshold of eigenvalues
 #'
 #'
-#' @return
+#' @return cormatrix.pd, the positive-definite adjusted correlation matrix
+#' @return lmin, the min threshold of eigenvalues
 #' @export
 #'
 #' @examples
@@ -99,7 +105,7 @@ nearpdf = function(cormatrix, pda.method, lmin){
 #' Selection of the eigen value threshold
 #'
 #' @param cormatrix input cormatrix
-#' @return
+#' @return lmin, the min threshold of eigenvalues
 #' @export
 #'
 
@@ -122,7 +128,7 @@ lminsel = function(cormatrix){
 #' @param x input vector
 #' @param y input vector
 #'
-#' @return
+#' @return cor, the pairwise correlations between x and y
 #' @export
 #'
 #' @examples
@@ -146,9 +152,12 @@ paircorxyf = function(x,y){
 #' @param e contamination rate
 #' @param r correlation coefficent
 #' @param gamma magnitude of outliers
-#' @param beta
+#' @param beta regression coefficients
 #'
-#' @return
+#' @return x, the generated design matrix
+#' @return y, the generated response vector
+#' @return beta, the regression coefficients we use
+#'
 #' @export
 #'
 #' @examples

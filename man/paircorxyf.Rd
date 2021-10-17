@@ -12,7 +12,7 @@ paircorxyf(x, y)
 \item{y}{input vector}
 }
 \value{
-
+cor, the pairwise correlations between x and y
 }
 \description{
 Pairwise correlation between x and y

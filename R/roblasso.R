@@ -1,4 +1,4 @@
-#' Robust adaptive lasso
+#' Robust adaptive lasso based on robust correlation estimates
 #'
 #' @param x input design matrix
 #' @param y input response vector
@@ -12,7 +12,9 @@
 #' @param cormatrix you could also use a correlation matrix as input
 #' @param scale put in scales if you use cormatrix
 #'
-#' @return
+#' @return betahat_opt, the optimal estimation of beta obtained from this algorithm
+#' @return lambda_opt is the optimal tuning parameter and sigma_opt is the optimal estimation of sigma.
+#' @return The output also includes the estimated correlation matrix, the estimated covariance matrix and et cetera from the covf function.
 #' @export
 #' @examples
 #' dat = genevar()
@@ -95,6 +97,5 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
        covmatrix = covmatrix, cormatrix = cormatrix, scale = scale,
        cor.method = cor.method, scale.method = scale.method, pda.method = pda.method,
        lmin = lmin, std = std, adaptive = adaptive,
-
        lambda_opt = lambda_opt, betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
 }

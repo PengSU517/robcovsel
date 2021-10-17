@@ -2,7 +2,7 @@
 % Please edit documentation in R/roblasso.R
 \name{covlasso}
 \alias{covlasso}
-\title{Robust adaptive lasso}
+\title{Robust adaptive lasso based on robust correlation estimates}
 \usage{
 covlasso(
   x,
@@ -40,8 +40,20 @@ if FALSE the robust covariance matrix is used.}
 \item{scale}{put in scales if you use cormatrix}
 }
 \value{
+betahat_opt, the optimal estimation of beta obtained from this algorithm
 
+lambda_opt is the optimal tuning parameter and sigma_opt is the optimal estimation of sigma.
+
+The output also includes the estimated correlation matrix, the estimated covariance matrix and et cetera from the covf function.
 }
 \description{
-Robust adaptive lasso
+Robust adaptive lasso based on robust correlation estimates
+}
+\examples{
+dat = genevar()
+y = dat$y
+x = dat$x
+fit = covlasso(x,y)
+fit$betahat_opt
+
 }
