@@ -1,5 +1,5 @@
 ---
-title: "simu"
+title: "Simulation"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simu}
@@ -88,8 +88,6 @@ where TP {denotes} the true positive number, FP the false postive number and FN 
 
 #### measurements
 {
-  msef<-function(betahat, beta){mean(((betahat-beta))^2)}
-  mse5f<-function(betahat, beta){mean(((betahat-beta)[1:5])^2)}
   tpf<-function(betahat, beta){sum((as.logical(betahat)==as.logical(beta))[1:5])}
   tnf<-function(betahat,beta){sum((as.logical(betahat)==as.logical(beta))[-(1:5)])}
 }
@@ -99,6 +97,7 @@ where TP {denotes} the true positive number, FP the false postive number and FN 
 
 
 ```{r}
+# parallel computation loops
 version = 0
 {
   systemtime = system.time({
@@ -112,11 +111,8 @@ version = 0
         set.seed(seed = seed)
         
         dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
-        #dataset = genevar(e = 0.1, gamma = 3)
         x = dataset$x
         y = dataset$y
-        #plot(x[,1:2])
-        #if(seed==1111){y = c(y,1)}
         beta = dataset$beta
         
         rst = list(lasso = NULL, slts = NULL, sss = NULL, algr = NULL, alrp = NULL)
@@ -148,7 +144,7 @@ version = 0
 
 
 
-
+# Visualization
 ```{r analysis}
 ########################## analysis
 
@@ -241,6 +237,7 @@ pp = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom
 pp
 ```
 
+[Selection results over 1,000 simulation runs for various contamination rates whenp=  20.   Each  column  represents  a  contamination  rate.   The  horizontal  axis  representsthe  magnitude  of  outlyingness  and  the  vertical  axis  gives  the  TPR,  FPR  and  F1score,respectively <img src="plots_20.png" width="600"/>](plots_20.png)
 
 
 

@@ -1,5 +1,5 @@
 ---
-title: "breastcancer"
+title: "Breast Cancer"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{breastcancer}
@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = F, 
+  warning = F
 )
 ```
 
@@ -29,6 +31,11 @@ library(corrplot)
 # setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 
+# Data description
+
+To illustrate a real data application for a high dimensional settings, we use the Breast Cancer dataset citep{van_t_veer_gene_2002} as an example. There are 24,481 genes of 117 breast tumor patients in this dataset. For the 78 breast cancer patients with disease-free survival time, {for each of the genes the} $\log_{10}(Intensity)$, $\log_{10}(Ratio)$ and p-value is given. We construct a regression model to select some important genes whose $\log_{10}(Intensity)$ are significantly related to the disease-free patient survival. For the sake of this, we regard the disease-free survival time as the response and use the  $\log_{10}(Intensity)$'s as predictors.
+
+It is assumed that only a few genes are associated with disease-free survival time. For very high dimensional datasets, usually we screen some variables first and then run variable selection based on the predictors we screened, such as in citet{bai_variable_2021}. Thus we first compute the robust marginal correlations (using the pairwise estimator cite{gnanadesikan_robust_1972} with the $Q_n$ scale estimator citep{rousseeuw_alternatives_1993}) of gene expressions with disease-free survival time and then select the 200 genes that have the largest robust pairwise correlation coefficients as predictors.
 
 ```{r analysis}
 y = breastcancer_screened$dat.surtime
@@ -37,12 +44,23 @@ x = breastcancer_screened[,c(-1,-2)]
 corrs = covf(as.matrix(x), scale.method = "qn", cor.method = "pair", pda.method = F)$cormatrix
 corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
 
+```
 
+# Outlier detection 
+Outlier detection results of those predictors based on DDC citep{rousseeuw_detecting_2018} is shown in Figure ref{breastcancer}. Most cells are yellow, showing they are not detected as outliers. Cells are flagged as outlying (red and blue cells) if the observed value and predicted value differ too much. A red cell means the observed value is larger than the predicted value and a blue cell means the observed value is smaller than the predicted value significantly.
+
+```{r}
 fit1 <- DDC(x)
 cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
         rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)
 #ggsave("breastcancer.eps",width = 12,height = 6)
+```
 
+
+# Variable selection
+Given the high cellwise contamination, traditional variable selection methods such as Lasso, or rowwise robust variable selection methods may lead to misleading selection results. With this consideration, cellwise robust methods may have better solutions. A sparse regression model is fitted via Lasso, sLTS, sShootingS, ALRP and ALGR, seperately. All selected genes are sorted based on the their robust pairwise correlations with the survival time.
+
+```{r}
 x = x[,sort(names(x))]
 
 lassofit = covlasso(x,y,cor.method = "pearson", scale.method = "sd", adaptive = F)

@@ -1,5 +1,5 @@
 ---
-title: "boston"
+title: "Boston Housing"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{boston}
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 #remotes::install_github("PengSU517/robcovsel")
-#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
+#remotes::install_github("PengSU517/shootings")
 #This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
 library(MASS) # the Boston dataset
 library(robcovsel)
@@ -26,6 +26,19 @@ library(doParallel)
 registerDoParallel(cores=10)
 ```
 
+# Data description and variable selection
+We illustrate the effect of cellwise outlier propagation on the previously considered estimators using the Boston Housing dataset. This data is available at the UCI maching learning repository (https://archive.ics.uci.edu/ml/index.php) and was collected from $506$ census samples on $14$ different variables. The original objective of the study is to analyze the association between the median housing values (\textit{medv}) in Boston and the residents willingness to pay for clean air, as well as the association between \textit{medv} and other variables in the dataset.
+
+We only consider the $9$ quantitative variables that were extensively studied.
+A sparse regression model is fitted for,
+$$
+	\log(medv) =  \ \beta_0 + \beta_1 \log(lstat) + \beta_2 rm + \beta_3 \log(dis) + \beta_4 tax \\  + \beta_5 ptratio  + \beta_6 nox+ \beta_7 age + \beta_8 black + \beta_9 \log(crim) + \varepsilon,\\
+$$
+and we compare the performance of five methods: Lasso citep{tibshirani_regression_1996}, sLTS citep{alfons_sparse_2013}, sShootingS citep{bottmer_sparse_2021} {as well as the new proposed methods ALRP and ALGR}.
+
+To measure the performance of variable selection when adding some known redundant variables, we generate $10$ {additional} random variables as redundant predictors using the same setting as in the previous simulation section. Therefore, we now have 19 predictors to choose from. 
+
+To test the performance under cellwise contamination, we standardize {the} 19 predictors with robust estimators of location (here we use the median) and scale (here we use $Q_n$). Then, for each predictor, $10\%$ {of the} cells are replaced by cellwise outliers which are randomly generated from $0.5 N(10, 1)+ 0.5N(-10, 1)$. As a comparison, we will also run simulations without any contamination {to investigate how stable the various methods are when known outliers are present in the data}. We repeat this process of adding ten redundant variables followed by generating 10\% of outliers in the 19 explanatory variables 1,000 times, and then compute the selection rates of each variable
 
 ```{r settings}
 {
@@ -88,6 +101,7 @@ system.time({result = foreach(m = 1:1000, .combine = "rbind",
 
 ```
 
+# Analysis
 ```{r analysis}
 {
   Boston_result = as.data.frame(as.matrix(result))
