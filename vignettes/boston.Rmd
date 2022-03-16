@@ -15,16 +15,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-#remotes::install_github("PengSU517/robcovsel")
-#remotes::install_github("PengSU517/shootings")
-#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
-library(MASS) # the Boston dataset
-library(robcovsel)
-library(tidyverse)
-library(doParallel)
-registerDoParallel(cores=10)
-```
 
 # Data description and variable selection
 We illustrate the effect of cellwise outlier propagation on the previously considered estimators using the Boston Housing dataset. This data is available at the UCI maching learning repository (https://archive.ics.uci.edu/ml/index.php) and was collected from $506$ census samples on $14$ different variables. The original objective of the study is to analyze the association between the median housing values (\textit{medv}) in Boston and the residents willingness to pay for clean air, as well as the association between \textit{medv} and other variables in the dataset.
@@ -40,82 +30,23 @@ To measure the performance of variable selection when adding some known redundan
 
 To test the performance under cellwise contamination, we standardize {the} 19 predictors with robust estimators of location (here we use the median) and scale (here we use $Q_n$). Then, for each predictor, $10\%$ {of the} cells are replaced by cellwise outliers which are randomly generated from $0.5 N(10, 1)+ 0.5N(-10, 1)$. As a comparison, we will also run simulations without any contamination {to investigate how stable the various methods are when known outliers are present in the data}. We repeat this process of adding ten redundant variables followed by generating 10\% of outliers in the 19 explanatory variables 1,000 times, and then compute the selection rates of each variable
 
-```{r settings}
-{
-  data("Boston")
-  y = log(Boston$medv)
-  Boston = Boston %>% mutate(loglstat = log(lstat), logdis = log(dis), logcrim = log(crim))
-  predictors = Boston[, c("loglstat", "rm", "logdis", "tax", "ptratio","nox", "age", "black", "logcrim")]
-}
-
-
-{
-  ms = 1:10
-  es = c(0, 0.1)
-}
-```
-
-```{r empirical work}
-system.time({result = foreach(m = 1:1000, .combine = "rbind", 
-                              .packages = c("shootings", "robustHD", "robcovsel"))%:%
-  
-  foreach(e = es, .combine = "rbind")%dopar%
-  {
-    {
-      set.seed(m)
-      n = length(y)
-      pr = 10
-      r = 0.5
-      mur = rep(0,pr)
-      sigmar = diag(rep(1^2,pr))
-      for (i in 1:pr) {for (j in 1:pr) {
-        if (i !=j)sigmar[i,j] = sqrt(sigmar[i,i]*sigmar[j,j])*r^abs(i-j)}}
-      xr = MASS::mvrnorm(n,mur,sigmar)
-      x = robustHD::robStandardize(cbind(predictors, xr), centerFun = median,  scaleFun = robustbase::Qn)
-      p = dim(x)[2]
-      
-      gamma = 10
-      mu = rep(0,p)
-      sigma = covf(x,cor.method = "pearson", scale.method = "qn", pda.method = F)$covmatrix
-      
-      bi = apply(matrix(0, nrow = n, ncol = p), 2, 
-                 function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
-      outlier = matrix(rnorm(n = n*p, mean = gamma, sd = 1),nrow = n,ncol=p)
-      xx = x*(1-bi) + bi*outlier
-      yy = y
-    }
-
-    {
-      lassofit = covlasso(xx,yy,cor.method = "pearson", scale.method = "sd", pda.method = F, adaptive = F)$betahat_opt
-      sLTSfit = sparseLTS(xx,yy)$coefficients[-1]
-      sssfit = sparseshooting(xx,yy)$coef[-1]
-      pairfit = covlasso(xx,yy)$betahat_opt
-      gaussrankfit = covlasso(xx,yy,cor.method = "gaussrank")$betahat_opt
-      
-      rst = rbind(e = e, m = m, cbind(lassofit, sLTSfit,sssfit, pairfit, gaussrankfit))
-      colnames(rst) = c("lasso", "sLTS", "sShootingS", "ALRP","ALGR")
-    }
-    
-    t(rst)
-  }})
-
-```
-
 # Analysis
 ```{r analysis}
 {
+  load("result_simu_boston.RData")
   Boston_result = as.data.frame(as.matrix(result))
-  Boston_result$method = rownames(result)
+  Boston_result$method = c("lasso", "alasso", "sLTS", "sShootingS", "LGR", "LRP", "ALGR", "ALRP")
   #save(Boston_result, file = "Boston_result.Rdata")
-  Boston_result$method = factor(Boston_result$method, levels = c("lasso", "sLTS", "sShootingS", "ALGR", "ALRP"))
+  Boston_result$method = factor(Boston_result$method, levels = c("lasso", "alasso", "sLTS", "sShootingS", "LGR", "LRP", "ALGR", "ALRP"))
   table = aggregate(.~e + method, data = Boston_result, function(x)mean(as.logical(x)))
   tbl = cbind(table[,(1:11)],redundant = rowMeans(table[,-(1:11)]));
   colnames(tbl)[3:11] = c("loglstat", "rm", "logdis", "tax", "ptratio", "nox", "age", "black", "logcrim")
-  #write_csv(tbl, "Boston_table.csv")
+  
 }
 
-
 tbl
+
+#write_csv(tbl, "Boston_table.csv")
 ```
 
 

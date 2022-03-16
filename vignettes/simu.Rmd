@@ -25,10 +25,7 @@ knitr::opts_chunk$set(
 #this shootings package is constructed based on ineswilms/sparse-shooting-S
 #rm(list = ls()) # clean slate
 #setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-```
 
-
-```{r analysis}
 #This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
 # rm(list = ls()) # clean slate
 # setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -74,12 +71,10 @@ library(tidyverse)
 library(gridExtra)
 library(grid)
 library(robcovsel)
-load("result_simu_p20.RData")
+load("result_simu_p200.RData")
 
 result1 = as.data.frame(t(as.data.frame(result)))
 result1 = result1[complete.cases(result1),]
-
-glimpse(result1)
 result1 = result1 %>% mutate(tp = as.numeric(tp), fp = as.numeric(fp), gamma = as.numeric(gamma), p = as.numeric(p), fn = 5-tp, tn = p-5-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)))
 #mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)))
 
@@ -88,37 +83,37 @@ summary = result1 %>% group_by(n,p,e,r,gamma,mtd) %>% summarise(
 summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "LRP",  "LGR", "sShootingS", "sLTS", "aLasso", "Lasso")))
 summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
 summary$r = factor(summary$r, labels = c("r = 0.5","r = 0.7","r = 0.9"))
-glimpse(summary)
+summary1 = summary %>% filter(r == "r = 0.9")
 
 ```
 
 
 ```{r}
-p1 = ggplot(data = summary, aes(x = gamma,y = F1, color = Method ))+
-  geom_line()+geom_point()+facet_grid(r~e) +
+p1 = ggplot(data = summary1, aes(x = gamma,y = F1, color = Method ))+
+  geom_line()+geom_point()+facet_grid(.~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   labs(fill = "", x = expression(gamma*": magnitude of outlyingness"), y = expression(F[1]))+ 
   guides(fill = guide_legend(title = "Thresholds")) +
   theme_light() +
-  theme(text= element_text(size=20))
+  theme(text= element_text(size=20), legend.position = "bottom")
 
-p2 = ggplot(data = summary, aes(x = gamma,y = TPR, color = Method ))+
-  geom_line()+geom_point()+facet_grid(r~e) +
+p2 = ggplot(data = summary1, aes(x = gamma,y = TPR, color = Method ))+
+  geom_line()+geom_point()+facet_grid(.~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
   guides(fill = guide_legend(title = "Thresholds")) +
   theme_light() +
-  theme(text= element_text(size=20))
+  theme(text= element_text(size=20), legend.position = "bottom")
 
-p3 = ggplot(data = summary, aes(x = gamma,y = FPR, color = Method ))+
-  geom_line()+geom_point()+facet_grid(r~e) +
+p3 = ggplot(data = summary1, aes(x = gamma,y = FPR, color = Method ))+
+  geom_line()+geom_point()+facet_grid(.~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
   guides(fill = guide_legend(title = "Thresholds")) +
   theme_light() +
-  theme(text= element_text(size=20))
+  theme(text= element_text(size=20), legend.position = "bottom")
 
 ```
 
@@ -147,7 +142,7 @@ ggsave("plots_20_fpr.eps", plot = p3, width = 10,height = 8)
 
 
 
-```{r}
+```{r fig.width=10, fig.height=10}
 grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
   
   plots <- list(...)
@@ -177,9 +172,28 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 }
 
 
-pp = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
-#ggsave("plots_200.eps", plot = pp, width = 10,height = 8)
+pp = grid_arrange_shared_legend(p1,p2,p3, nrow = 3, ncol = 1, position = "bottom")
+ggsave("plots_200_r09.eps", plot = pp, width = 10,height = 10)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
