@@ -46,8 +46,8 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
   if(std){Sigma = cormatrix
   }else{Sigma = covmatrix}
 
-  svdrst = svd(Sigma)
-  Sigmasqrt = (svdrst$u)%*%diag(sqrt(svdrst$d))%*%t(svdrst$v)
+  eigenrst = eigen(Sigma)
+  Sigmasqrt = (eigenrst$vectors)%*%diag(sqrt(eigenrst$values))%*%t(eigenrst$vectors)
 
   response = as.matrix(Sigmasqrt[,1])
   predictor = Sigmasqrt[,-1]

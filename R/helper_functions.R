@@ -153,7 +153,8 @@ paircorxyf = function(x,y){
 #'
 #' @examples
 #'
-genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10){
+genevar = function(n = 100, p = 20, e = 0.05, r = 0.5,
+                   beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10, errorsigma = 1){
   {
     mu = rep(0,p)
     sigma = diag(rep(1^2,p))
@@ -163,7 +164,7 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, beta = c(1,2,1,2,1,rep(0,
 
   {
     xr = mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
-    error = rnorm(n,0,0.5)
+    error = rnorm(n,0,errorsigma)
     y = xr%*%beta + error
     bi = apply(matrix(0, nrow = n, ncol = p), 2,
                function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})

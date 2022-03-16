@@ -37,6 +37,42 @@ fit1$pda.method
 fit1$adaptive
 fit1$lmin
 head(fit1$betahat_opt)
+
+
+x = dataset$x
+y = dataset$y
+
 ```
+
+
+
+
+```{r}
+library(doParallel)
+registerDoParallel(cores=8)
+getDoParWorkers()
+
+# to prevent automatic parallel computation when doing linear algebra (OpenBLAS)
+library(inline)
+openblas.set.num.threads <- cfunction( signature(ipt="integer"),
+                                         body = 'openblas_set_num_threads(*ipt);',
+                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
+                                         libargs = c('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
+                                         language = "C",
+                                         convention = ".C")
+openblas.set.num.threads(1) 
+set.seed(500131)
+dataset1 = genevar(p = 200, e = 0.1, gamma = 0)
+fit12 = covlasso(dataset1$x,dataset1$y,cor.method = "gaussrank",scale.method = "qn")
+
+
+fit = covf(cbind(dataset1$y,dataset1$x),cor.method = "gaussrank", scale.method = "qn", pda.method = "nearpd")
+Sigma = fit$cormatrix
+dim(Sigma)
+eigenrst = eigen(Sigma)
+Sigmasqrt = (eigenrst$vectors)%*%diag(sqrt(eigenrst$values))%*%t(eigenrst$vectors)
+```
+
+
 
 

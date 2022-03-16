@@ -17,154 +17,48 @@ knitr::opts_chunk$set(
 ```{r setup}
 #########system settings
 #remotes::install_github("PengSU517/robcovsel")
-library(robcovsel)
 #remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
 #this shootings package is constructed based on ineswilms/sparse-shooting-S
-rm(list = ls()) # clean slate
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-```
-
-```{r parallel computation settings}
-library(doParallel)
-registerDoParallel(cores=8)
-getDoParWorkers()
-
-# to prevent automatic parallel computation when doing linear algebra (OpenBLAS)
-#library(inline)
-#openblas.set.num.threads <- cfunction( signature(ipt="integer"),
-#                                         body = 'openblas_set_num_threads(*ipt);',
-#                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
-#                                         libargs = c #('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
-#                                         language = "C",
-#                                         convention = ".C")
-#openblas.set.num.threads(1) 
+#rm(list = ls()) # clean slate
+#setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 ```
 
 
-```{r}
-###### data generation settings
-{
-  ms = 1:1000
-  ps = 10 # ps = 200 in high dimensional settings
-  es = c(0.02, 0.05, 0.1)
-  gammas = seq(0, 10, 2)
-}
-
-
-##### methods
-{
-  lassof = function(x,y){covlasso(x,y,cor.method = "pearson",scale.method = "sd", ada = F)$betahat_opt}
-  sparseShootingSf = function(x,y){shootings::sparseshooting(x,y)$coef[-1]}
-  sltsf = function(x,y){fit = robustHD::sparseLTS(x,y);fit$coefficients[-1]}
-  algrf = function(x,y){covlasso(x,y,cor.method = "gaussrank", ada = T)$betahat_opt}
-  alrpf = function(x,y){covlasso(x, y, ada = T)$betahat_opt}
-  
-  mtds = list(Lasso = lassof, 
-              sLTS = sltsf, 
-              sShootingS = sparseShootingSf,
-              ALGR = algrf,
-              ALRP = alrpf
-  )
-}
-
-#### measurements
-{
-  msef<-function(betahat, beta){mean(((betahat-beta))^2)}
-  mse5f<-function(betahat, beta){mean(((betahat-beta)[1:5])^2)}
-  tpf<-function(betahat, beta){sum((as.logical(betahat)==as.logical(beta))[1:5])}
-  tnf<-function(betahat,beta){sum((as.logical(betahat)==as.logical(beta))[-(1:5)])}
-}
-
-
-```
-
-
-```{r}
-{
-  systemtime = system.time({
-    result <- foreach(m = ms, 
-                      .packages = c("robustHD","robcovsel", "shootings"))%:%
-      foreach(p = ps)%:%
-      foreach(e = es)%:%
-      foreach(gamma = gammas)%dopar% {
-        
-        seed = which(gammas==gamma) + 10*which(es==e) + 100*which(ps==p) + 1000*which(ms==m)
-        set.seed(seed = seed)
-        
-        dataset = robcovsel::genevar(n = 100, p = p, e = e, r = 0.5, gamma = gamma)
-        #dataset = genevar(e = 0.1, gamma = 3)
-        x = dataset$x
-        y = dataset$y
-        #plot(x[,1:2])
-        #if(seed==1111){y = c(y,1)}
-        beta = dataset$beta
-        
-        rst = list(lasso = NULL, slts = NULL, sss = NULL, algr = NULL, alrp = NULL)
-        for (mtd in 1:length(mtds)) {
-          try({
-            betahat = mtds[[mtd]](x,y)
-            mse = msef(betahat, beta)
-            mse5 = mse5f(betahat, beta)
-            tp = tpf(betahat, beta)
-            tn = tnf(betahat, beta)
-            rst[[mtd]] = c(m = m, n = 100, p = p, e = e, gamma = gamma, mtd = names(mtds)[mtd], seed =seed,  
-                           mse = mse, mse5 = mse5, tp = tp, fp = (p-5)-tn)
-          }, TRUE
-          )
-          if(is.null(rst[[mtd]])){rst[[mtd]]=rep(NA, 11)}
-        }
-        rst
-      }
-  })
-  
-  
-  
-  #save(result, file = "result_simu_p200.RData")
-}
-```
-
-
-
-
-```{r analysis}
-########################## analysis
-
+```{r analysis,  fig.width=10, fig.height=12}
 library(tidyverse)
 library(gridExtra)
 library(grid)
-
+library(robcovsel)
+load("result_simu_p20.RData")
 
 result1 = as.data.frame(t(as.data.frame(result)))
 result1 = result1[complete.cases(result1),]
 
 glimpse(result1)
-result1 = result1 %>% mutate(tp = as.numeric(tp), fp = as.numeric(fp), gamma = as.numeric(gamma), p = as.numeric(p),
-                           fn = 5-tp, tn = p-5-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn))#,
-                           #mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)))
-                           )
+result1 = result1 %>% mutate(tp = as.numeric(tp), fp = as.numeric(fp), gamma = as.numeric(gamma), p = as.numeric(p), fn = 5-tp, tn = p-5-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)))
+#mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)))
 
-summary = result1 %>% group_by(n,p,e,gamma,mtd) %>% summarise(
+summary = result1 %>% group_by(n,p,e,r,gamma,mtd) %>% summarise(
   TPR = mean(tp/5, na.rm = T),FPR = mean(fp/(p-5), na.rm = T), F1 = mean(f1))%>%ungroup()
-summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "sShootingS", "sLTS","Lasso")))
+summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "LRP",  "LGR", "sShootingS", "sLTS", "aLasso", "Lasso")))
 summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
+summary$r = factor(summary$r, labels = c("r = 0.5","r = 0.7","r = 0.9"))
 glimpse(summary)
 
+```
 
-p1 = ggplot(data = summary, aes(x = gamma,y = F1, color = Method ))+geom_line()+geom_point()+facet_wrap(~e) +
+
+```{r}
+p1 = ggplot(data = summary, aes(x = gamma,y = F1, color = Method ))+
+  geom_line()+geom_point()+facet_grid(r~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   labs(fill = "", x = expression(gamma*": magnitude of outlyingness"), y = expression(F[1]))+ 
   guides(fill = guide_legend(title = "Thresholds")) +
   theme_light() +
   theme(text= element_text(size=20))
 
-p2 = ggplot(data = summary, aes(x = gamma,y = MCC, color = Method ))+geom_line()+geom_point()+facet_wrap(~e) +
-  scale_x_continuous(breaks=seq(0,12,2)) +
-  labs(fill = "", x = "")+ 
-  guides(fill = guide_legend(title = "Thresholds")) +
-  theme_light() +
-  theme(text= element_text(size=20))
-
-p3 = ggplot(data = summary, aes(x = gamma,y = TPR, color = Method ))+geom_line()+geom_point()+ facet_wrap(~e) +
+p2 = ggplot(data = summary, aes(x = gamma,y = TPR, color = Method ))+
+  geom_line()+geom_point()+facet_grid(r~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
@@ -172,7 +66,8 @@ p3 = ggplot(data = summary, aes(x = gamma,y = TPR, color = Method ))+geom_line()
   theme_light() +
   theme(text= element_text(size=20))
 
-p4 = ggplot(data = summary, aes(x = gamma,y = FPR, color = Method ))+geom_line()+geom_point()+ facet_wrap(~e) +
+p3 = ggplot(data = summary, aes(x = gamma,y = FPR, color = Method ))+
+  geom_line()+geom_point()+facet_grid(r~e) +
   scale_x_continuous(breaks=seq(0,12,2)) +
   ylim(0,1) +
   labs(fill = "", x = "")+ 
@@ -180,7 +75,34 @@ p4 = ggplot(data = summary, aes(x = gamma,y = FPR, color = Method ))+geom_line()
   theme_light() +
   theme(text= element_text(size=20))
 
+```
 
+
+```{r  fig.width=10, fig.height=10}
+p1
+
+p2
+
+p3
+
+ggsave("plots_20_f1.eps", plot = p1, width = 10,height = 8)
+
+ggsave("plots_20_tpr.eps", plot = p2, width = 10,height = 8)
+
+ggsave("plots_20_fpr.eps", plot = p3, width = 10,height = 8)
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
   
   plots <- list(...)
@@ -212,10 +134,6 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 
 pp = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
 #ggsave("plots_200.eps", plot = pp, width = 10,height = 8)
-```
-
-```{r, fig.width=10, fig.height=10}
-pp
 ```
 
 
