@@ -17,18 +17,21 @@ knitr::opts_chunk$set(
 ```{r setup}
 #remotes::install_github("PengSU517/robcovsel")
 #remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
-#this shootings package is constructed based on ineswilms/sparse-shooting-S
+#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
 library(robcovsel)
 library(shootings)
 ```
 
+# Data generation 
 ```{r data generation}
-gen = genevar(e = 0.1)
+gen = genevar(p = 10, e = 0.1)
 x = gen$x
 y = gen$y
 ```
 
+# test
 ```{r}
+
 system.time({fit1 = covlasso(x,y,cor.method = "pair",scale.method = "qn")})  
 system.time({fit2 = covlasso(x,y,cor.method = "gaussrank",scale.method = "qn")})
 system.time({fit3 = sparseshooting(x,y) })
@@ -71,6 +74,7 @@ Sigma = fit$cormatrix
 dim(Sigma)
 eigenrst = eigen(Sigma)
 Sigmasqrt = (eigenrst$vectors)%*%diag(sqrt(eigenrst$values))%*%t(eigenrst$vectors)
+
 ```
 
 

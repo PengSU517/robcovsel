@@ -18,7 +18,13 @@ covf(x, cor.method, scale.method, pda.method, lmin = NULL)
 \item{lmin}{min threshold of eigenvalues}
 }
 \value{
+covmatrix, the estimated covariance matrix
 
+cormatrix, the estimated correlation matrix
+
+scale, the estimated scale vector
+
+lmin, the min threshold of eigenvalues
 }
 \description{
 Correlation estimators

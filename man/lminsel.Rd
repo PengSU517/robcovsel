@@ -10,7 +10,7 @@ lminsel(cormatrix)
 \item{cormatrix}{input cormatrix}
 }
 \value{
-
+lmin, the min threshold of eigenvalues
 }
 \description{
 Selection of the eigen value threshold

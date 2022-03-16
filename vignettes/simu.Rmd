@@ -1,5 +1,5 @@
 ---
-title: "simu"
+title: "Simulation"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simu}
@@ -10,10 +10,14 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
+
+#https://pengsu517.github.io/robcovsel
 ```
 
+# System settings
 ```{r setup}
 #########system settings
 #remotes::install_github("PengSU517/robcovsel")
@@ -24,7 +28,48 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r analysis,  fig.width=10, fig.height=12}
+```{r analysis}
+#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
+# rm(list = ls()) # clean slate
+# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+```
+
+```{r parallel computation settings}
+#library(doParallel)
+#registerDoParallel(cores=8)
+#getDoParWorkers()
+
+# to prevent automatic parallel computation when doing linear algebra (OpenBLAS)
+#library(inline)
+#openblas.set.num.threads <- cfunction( signature(ipt="integer"),
+#                                         body = 'openblas_set_num_threads(*ipt);',
+#                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
+#                                         libargs = c #('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
+#                                         language = "C",
+#                                         convention = ".C")
+#openblas.set.num.threads(1) 
+```
+
+# Data generation settings 
+
+Consider the linear regression model 
+$$
+y_i = \mathbf{x}_i^\top \pmb{\beta} + \varepsilon_i, i = 1,\ldots, n,
+$$
+in our simulations, we set $n = 100$, $p = 20$, $\pmb\beta = (1,2,1,2,1, \pmb 0_{p-5}^\top )^\top$, $\mathbf{x}_i$ is sampled from $N(\pmb 0,\pmb\Sigma_{xx})$ and $\varepsilon_i$ is sampled from $N(0,0.5^2)$. The correlation structure among variables is given by $\Sigma _{ij} = \rho^{|i-j|}$ and we set $\rho = 0.5$. 
+
+Contamination proportions are set as $ 2\%$, $5\%$ and $10\%$ for all predictors separately. Outlying cells of all variables are randomly generated from $0.5 N(\gamma, 1)+ 0.5N(-\gamma, 1)$. We vary $\gamma$ over the set $\{0,2,4,6,8,10\}$ to simulate outliers with different magnitudes. When we apply appropriate $\gamma$'s, those cells will be outlying cells but not not necessarily marginal outliers.
+
+For Lasso, ALGR and ALRP, we use the $\mathrm{BIC}$ as defined in (\ref{bic}) to choose the regularization tuning parameter $\lambda$. For sLTS and sShootingS, their default selection criteria are used. To assess the performance of the considered methods, we {use} the true positive rate (TPR), the false positive rate (FPR) and the balanced F-score ($\mathrm{F_1}$ score) {defined by}
+$$
+\mathrm{F_1} = \frac{\mathrm{TP}}{\mathrm{TP} + \frac{1}{2} (\mathrm{FP}+\mathrm{FN})},
+$$
+where TP {denotes} the true positive number, FP the false postive number and FN the false negative number, respectively. We run $1,000$ simulations for each scenario and use the average TPR, FPR and $\mathrm{F_1}$ score to measure the performance of each method.
+
+
+# Visualization
+```{r analysis}
+
 library(tidyverse)
 library(gridExtra)
 library(grid)
@@ -135,6 +180,7 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
 pp = grid_arrange_shared_legend(p3,p4,p1, nrow = 3, ncol = 1, position = "bottom")
 #ggsave("plots_200.eps", plot = pp, width = 10,height = 8)
 ```
+
 
 
 
