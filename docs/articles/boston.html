@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">robcovsel</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -78,7 +74,7 @@
 
       
 
-      </header><script src="boston_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Boston Housing</h1>
@@ -91,98 +87,83 @@
 
     
     
+<div class="section level2">
+<h2 id="data-description-and-variable-selection">Data description and variable selection<a class="anchor" aria-label="anchor" href="#data-description-and-variable-selection"></a>
+</h2>
+<p>We illustrate the effect of cellwise outlier propagation on the
+previously considered estimators using the Boston Housing dataset. This
+data is available at the UCI maching learning repository (<a href="https://archive.ics.uci.edu/ml/index.php" class="external-link uri">https://archive.ics.uci.edu/ml/index.php</a>) and was
+collected from <span class="math inline">\(506\)</span> census samples
+on <span class="math inline">\(14\)</span> different variables. The
+original objective of the study is to analyze the association between
+the median housing values () in Boston and the residents willingness to
+pay for clean air, as well as the association between and other
+variables in the dataset.</p>
+<p>We only consider the <span class="math inline">\(9\)</span>
+quantitative variables that were extensively studied. A sparse
+regression model is fitted for, <span class="math display">\[
+    \log(medv) =  \ \beta_0 + \beta_1 \log(lstat) + \beta_2 rm + \beta_3
+\log(dis) + \beta_4 tax \\  + \beta_5 ptratio  + \beta_6 nox+ \beta_7
+age + \beta_8 black + \beta_9 \log(crim) + \varepsilon,\\
+\]</span> and we compare the performance of five methods: Lasso
+citep{tibshirani_regression_1996}, sLTS citep{alfons_sparse_2013},
+sShootingS citep{bottmer_sparse_2021} {as well as the new proposed
+methods ALRP and ALGR}.</p>
+<p>To measure the performance of variable selection when adding some
+known redundant variables, we generate <span class="math inline">\(10\)</span> {additional} random variables as
+redundant predictors using the same setting as in the previous
+simulation section. Therefore, we now have 19 predictors to choose
+from.</p>
+<p>To test the performance under cellwise contamination, we standardize
+{the} 19 predictors with robust estimators of location (here we use the
+median) and scale (here we use <span class="math inline">\(Q_n\)</span>). Then, for each predictor, <span class="math inline">\(10\%\)</span> {of the} cells are replaced by
+cellwise outliers which are randomly generated from <span class="math inline">\(0.5 N(10, 1)+ 0.5N(-10, 1)\)</span>. As a
+comparison, we will also run simulations without any contamination {to
+investigate how stable the various methods are when known outliers are
+present in the data}. We repeat this process of adding ten redundant
+variables followed by generating 10% of outliers in the 19 explanatory
+variables 1,000 times, and then compute the selection rates of each
+variable</p>
+</div>
+<div class="section level2">
+<h2 id="analysis">Analysis<a class="anchor" aria-label="anchor" href="#analysis"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#remotes::install_github("PengSU517/robcovsel")</span>
-<span class="co">#remotes::install_github("PengSU517/shootings")</span>
-<span class="co">#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/">MASS</a></span><span class="op">)</span> <span class="co"># the Boston dataset</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">doParallel</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html">registerDoParallel</a></span><span class="op">(</span>cores<span class="op">=</span><span class="fl">10</span><span class="op">)</span></code></pre></div>
-<div id="data-description-and-variable-selection" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data-description-and-variable-selection" class="anchor"></a>Data description and variable selection</h1>
-<p>We illustrate the effect of cellwise outlier propagation on the previously considered estimators using the Boston Housing dataset. This data is available at the UCI maching learning repository (<a href="https://archive.ics.uci.edu/ml/index.php" class="uri">https://archive.ics.uci.edu/ml/index.php</a>) and was collected from <span class="math inline">\(506\)</span> census samples on <span class="math inline">\(14\)</span> different variables. The original objective of the study is to analyze the association between the median housing values () in Boston and the residents willingness to pay for clean air, as well as the association between  and other variables in the dataset.</p>
-<p>We only consider the <span class="math inline">\(9\)</span> quantitative variables that were extensively studied. A sparse regression model is fitted for, <span class="math display">\[
-    \log(medv) =  \ \beta_0 + \beta_1 \log(lstat) + \beta_2 rm + \beta_3 \log(dis) + \beta_4 tax \\  + \beta_5 ptratio  + \beta_6 nox+ \beta_7 age + \beta_8 black + \beta_9 \log(crim) + \varepsilon,\\
-\]</span> and we compare the performance of five methods: Lasso citep{tibshirani_regression_1996}, sLTS citep{alfons_sparse_2013}, sShootingS citep{bottmer_sparse_2021} {as well as the new proposed methods ALRP and ALGR}.</p>
-<p>To measure the performance of variable selection when adding some known redundant variables, we generate <span class="math inline">\(10\)</span> {additional} random variables as redundant predictors using the same setting as in the previous simulation section. Therefore, we now have 19 predictors to choose from.</p>
-<p>To test the performance under cellwise contamination, we standardize {the} 19 predictors with robust estimators of location (here we use the median) and scale (here we use <span class="math inline">\(Q_n\)</span>). Then, for each predictor, <span class="math inline">\(10\%\)</span> {of the} cells are replaced by cellwise outliers which are randomly generated from <span class="math inline">\(0.5 N(10, 1)+ 0.5N(-10, 1)\)</span>. As a comparison, we will also run simulations without any contamination {to investigate how stable the various methods are when known outliers are present in the data}. We repeat this process of adding ten redundant variables followed by generating 10% of outliers in the 19 explanatory variables 1,000 times, and then compute the selection rates of each variable</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span> <span class="co"># the Boston dataset</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">doParallel</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot" class="external-link">corrplot</a></span><span class="op">)</span>
+
+
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Boston"</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Boston</span><span class="op">$</span><span class="va">medv</span><span class="op">)</span>
+<span class="va">Boston</span> <span class="op">=</span> <span class="va">Boston</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>loglstat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">lstat</span><span class="op">)</span>, logdis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">dis</span><span class="op">)</span>, logcrim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">crim</span><span class="op">)</span><span class="op">)</span>
+<span class="va">predictors</span> <span class="op">=</span> <span class="va">Boston</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"loglstat"</span>, <span class="st">"rm"</span>, <span class="st">"logdis"</span>, <span class="st">"tax"</span>, <span class="st">"ptratio"</span>,<span class="st">"nox"</span>, <span class="st">"age"</span>, <span class="st">"black"</span>, <span class="st">"logcrim"</span><span class="op">)</span><span class="op">]</span>
+
+
+<span class="va">corrs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">predictors</span><span class="op">)</span>
+<span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">corrs</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">corrs</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"log(lstat)"</span>, <span class="st">"rm"</span>, <span class="st">"log(dis)"</span>, <span class="st">"tax"</span>, <span class="st">"ptratio"</span>,<span class="st">"nox"</span>, <span class="st">"age"</span>, <span class="st">"black"</span>, <span class="st">"log(crim)"</span><span class="op">)</span>
+<span class="va">corrsplot</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/corrplot/man/corrplot.html" class="external-link">corrplot</a></span><span class="op">(</span><span class="va">corrs</span>, method <span class="op">=</span> <span class="st">"shade"</span>, tl.col <span class="op">=</span><span class="st">"black"</span>,shade.col <span class="op">=</span> <span class="cn">NA</span>, tl.srt <span class="op">=</span> <span class="fl">45</span>, order <span class="op">=</span> <span class="st">"FPC"</span><span class="op">)</span>
+<span class="va">corrsplot</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"Boston"</span><span class="op">)</span>
-  <span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">Boston</span><span class="op">$</span><span class="va">medv</span><span class="op">)</span>
-  <span class="va">Boston</span> <span class="op">=</span> <span class="va">Boston</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>loglstat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">lstat</span><span class="op">)</span>, logdis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">dis</span><span class="op">)</span>, logcrim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">crim</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">predictors</span> <span class="op">=</span> <span class="va">Boston</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"loglstat"</span>, <span class="st">"rm"</span>, <span class="st">"logdis"</span>, <span class="st">"tax"</span>, <span class="st">"ptratio"</span>,<span class="st">"nox"</span>, <span class="st">"age"</span>, <span class="st">"black"</span>, <span class="st">"logcrim"</span><span class="op">)</span><span class="op">]</span>
-<span class="op">}</span>
-
-
-<span class="op">{</span>
-  <span class="va">ms</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>
-  <span class="va">es</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">result</span> <span class="op">=</span> <span class="fu">foreach</span><span class="op">(</span>m <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span>, .combine <span class="op">=</span> <span class="st">"rbind"</span>, 
-                              .packages <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"shootings"</span>, <span class="st">"robustHD"</span>, <span class="st">"robcovsel"</span><span class="op">)</span><span class="op">)</span><span class="op">%:%</span>
-  
-  <span class="fu">foreach</span><span class="op">(</span>e <span class="op">=</span> <span class="va">es</span>, .combine <span class="op">=</span> <span class="st">"rbind"</span><span class="op">)</span><span class="op">%dopar%</span>
-  <span class="op">{</span>
-    <span class="op">{</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>
-      <span class="va">n</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span>
-      <span class="va">pr</span> <span class="op">=</span> <span class="fl">10</span>
-      <span class="va">r</span> <span class="op">=</span> <span class="fl">0.5</span>
-      <span class="va">mur</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">pr</span><span class="op">)</span>
-      <span class="va">sigmar</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">^</span><span class="fl">2</span>,<span class="va">pr</span><span class="op">)</span><span class="op">)</span>
-      <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">pr</span><span class="op">)</span> <span class="op">{</span><span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">pr</span><span class="op">)</span> <span class="op">{</span>
-        <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">!=</span><span class="va">j</span><span class="op">)</span><span class="va">sigmar</span><span class="op">[</span><span class="va">i</span>,<span class="va">j</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">sigmar</span><span class="op">[</span><span class="va">i</span>,<span class="va">i</span><span class="op">]</span><span class="op">*</span><span class="va">sigmar</span><span class="op">[</span><span class="va">j</span>,<span class="va">j</span><span class="op">]</span><span class="op">)</span><span class="op">*</span><span class="va">r</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">i</span><span class="op">-</span><span class="va">j</span><span class="op">)</span><span class="op">}</span><span class="op">}</span>
-      <span class="va">xr</span> <span class="op">=</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span><span class="va">n</span>,<span class="va">mur</span>,<span class="va">sigmar</span><span class="op">)</span>
-      <span class="va">x</span> <span class="op">=</span> <span class="fu">robustHD</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/robustHD/man/standardize.html">robStandardize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">predictors</span>, <span class="va">xr</span><span class="op">)</span>, centerFun <span class="op">=</span> <span class="va">median</span>,  scaleFun <span class="op">=</span> <span class="fu">robustbase</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/robustbase/man/Qn.html">Qn</a></span><span class="op">)</span>
-      <span class="va">p</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>
-      
-      <span class="va">gamma</span> <span class="op">=</span> <span class="fl">10</span>
-      <span class="va">mu</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">p</span><span class="op">)</span>
-      <span class="va">sigma</span> <span class="op">=</span> <span class="fu"><a href="../reference/covf.html">covf</a></span><span class="op">(</span><span class="va">x</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, pda.method <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">covmatrix</span>
-      
-      <span class="va">bi</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="va">p</span><span class="op">)</span>, <span class="fl">2</span>, 
-                 <span class="kw">function</span><span class="op">(</span><span class="va">xvec</span><span class="op">)</span> <span class="op">{</span><span class="va">xvec</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span>, size <span class="op">=</span> <span class="va">e</span><span class="op">*</span><span class="va">n</span><span class="op">)</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span>; <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">xvec</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>
-      <span class="va">outlier</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">*</span><span class="va">p</span>, mean <span class="op">=</span> <span class="va">gamma</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,nrow <span class="op">=</span> <span class="va">n</span>,ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span>
-      <span class="va">xx</span> <span class="op">=</span> <span class="va">x</span><span class="op">*</span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">bi</span><span class="op">)</span> <span class="op">+</span> <span class="va">bi</span><span class="op">*</span><span class="va">outlier</span>
-      <span class="va">yy</span> <span class="op">=</span> <span class="va">y</span>
-    <span class="op">}</span>
-
-    <span class="op">{</span>
-      <span class="va">lassofit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">xx</span>,<span class="va">yy</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>, scale.method <span class="op">=</span> <span class="st">"sd"</span>, pda.method <span class="op">=</span> <span class="cn">F</span>, adaptive <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">betahat_opt</span>
-      <span class="va">sLTSfit</span> <span class="op">=</span> <span class="fu">sparseLTS</span><span class="op">(</span><span class="va">xx</span>,<span class="va">yy</span><span class="op">)</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>
-      <span class="va">sssfit</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="va">xx</span>,<span class="va">yy</span><span class="op">)</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>
-      <span class="va">pairfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">xx</span>,<span class="va">yy</span><span class="op">)</span><span class="op">$</span><span class="va">betahat_opt</span>
-      <span class="va">gaussrankfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">xx</span>,<span class="va">yy</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span><span class="op">)</span><span class="op">$</span><span class="va">betahat_opt</span>
-      
-      <span class="va">rst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>e <span class="op">=</span> <span class="va">e</span>, m <span class="op">=</span> <span class="va">m</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">lassofit</span>, <span class="va">sLTSfit</span>,<span class="va">sssfit</span>, <span class="va">pairfit</span>, <span class="va">gaussrankfit</span><span class="op">)</span><span class="op">)</span>
-      <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">rst</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"lasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span>, <span class="st">"ALRP"</span>,<span class="st">"ALGR"</span><span class="op">)</span>
-    <span class="op">}</span>
-    
-    <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">rst</span><span class="op">)</span>
-  <span class="op">}</span><span class="op">}</span><span class="op">)</span></code></pre></div>
-</div>
-<div id="analysis" class="section level1">
-<h1 class="hasAnchor">
-<a href="#analysis" class="anchor"></a>Analysis</h1>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="op">{</span>
-  <span class="va">Boston_result</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>
+  <span class="co">##load("result_simu_boston.RData")</span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">result_simu_boston</span><span class="op">)</span>
+  <span class="va">Boston_result</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lasso"</span>, <span class="st">"alasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span>, <span class="st">"LGR"</span>, <span class="st">"LRP"</span>, <span class="st">"ALGR"</span>, <span class="st">"ALRP"</span><span class="op">)</span>
   <span class="co">#save(Boston_result, file = "Boston_result.Rdata")</span>
-  <span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"lasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span>, <span class="st">"ALGR"</span>, <span class="st">"ALRP"</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">table</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html">aggregate</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">e</span> <span class="op">+</span> <span class="va">method</span>, data <span class="op">=</span> <span class="va">Boston_result</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-  <span class="va">tbl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">table</span><span class="op">[</span>,<span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span>,redundant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">table</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>;
-  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"loglstat"</span>, <span class="st">"rm"</span>, <span class="st">"logdis"</span>, <span class="st">"tax"</span>, <span class="st">"ptratio"</span>, <span class="st">"nox"</span>, <span class="st">"age"</span>, <span class="st">"black"</span>, <span class="st">"logcrim"</span><span class="op">)</span>
-  <span class="co">#write_csv(tbl, "Boston_table.csv")</span>
+  <span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Boston_result</span><span class="op">$</span><span class="va">method</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALRP"</span>, <span class="st">"LRP"</span>, <span class="st">"ALGR"</span>, <span class="st">"LGR"</span>, <span class="st">"lasso"</span>, <span class="st">"alasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">table</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">e</span> <span class="op">+</span> <span class="va">method</span>, data <span class="op">=</span> <span class="va">Boston_result</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">tbl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">table</span><span class="op">[</span>,<span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span>,redundant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">table</span><span class="op">[</span>,<span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>;
+  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">11</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"log(lstat)"</span>, <span class="st">"rm"</span>, <span class="st">"log(dis)"</span>, <span class="st">"tax"</span>, <span class="st">"ptratio"</span>,<span class="st">"nox"</span>, <span class="st">"age"</span>, <span class="st">"black"</span>, <span class="st">"log(crim)"</span><span class="op">)</span>
+  
 <span class="op">}</span>
 
+<span class="va">tbl</span>
+<span class="va">tbl</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"method"</span>,<span class="st">"e"</span>,  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">corrsplot</span><span class="op">$</span><span class="va">corr</span><span class="op">)</span>, <span class="st">"redundant"</span><span class="op">)</span><span class="op">]</span>
 
-<span class="va">tbl</span></code></pre></div>
+<span class="co">#write_csv(tbl[,c("method","e",  rownames(corrsplot$corr), "redundant")], "Boston_table.csv")</span></code></pre></div>
 </div>
   </div>
 
@@ -197,11 +178,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Peng Su, Garth Tarr, Samuel Mueller.</p>
+  <p></p>
+<p>Developed by Peng Su, Garth Tarr, Samuel Muller.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -209,6 +192,8 @@
 
   
 
+
+  
 
   </body>
 </html>

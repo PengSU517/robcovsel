@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">robcovsel</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -78,7 +74,7 @@
 
       
 
-      </header><script src="breastcancer_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Breast Cancer</h1>
@@ -95,66 +91,112 @@
 <code class="sourceCode R"><span class="co">#remotes::install_github("PengSU517/robcovsel")</span>
 <span class="co">#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!</span>
 <span class="co">#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">robustHD</span><span class="op">)</span> <span class="co">#sparse LTS</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">shootings</span><span class="op">)</span> <span class="co"># sparse shooting S</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">cellWise</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot">corrplot</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robustHD</span><span class="op">)</span> <span class="co">#sparse LTS</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">shootings</span><span class="op">)</span> <span class="co"># sparse shooting S</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cellWise</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot" class="external-link">corrplot</a></span><span class="op">)</span>
 
 <span class="co"># rm(list = ls()) # clean slate</span>
 <span class="co"># setwd(dirname(rstudioapi::getSourceEditorContext()$path))</span></code></pre></div>
-<div id="data-description" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data-description" class="anchor"></a>Data description</h1>
-<p>To illustrate a real data application for a high dimensional settings, we use the Breast Cancer dataset citep{van_t_veer_gene_2002} as an example. There are 24,481 genes of 117 breast tumor patients in this dataset. For the 78 breast cancer patients with disease-free survival time, {for each of the genes the} <span class="math inline">\(\log_{10}(Intensity)\)</span>, <span class="math inline">\(\log_{10}(Ratio)\)</span> and p-value is given. We construct a regression model to select some important genes whose <span class="math inline">\(\log_{10}(Intensity)\)</span> are significantly related to the disease-free patient survival. For the sake of this, we regard the disease-free survival time as the response and use the <span class="math inline">\(\log_{10}(Intensity)\)</span>’s as predictors.</p>
-<p>It is assumed that only a few genes are associated with disease-free survival time. For very high dimensional datasets, usually we screen some variables first and then run variable selection based on the predictors we screened, such as in citet{bai_variable_2021}. Thus we first compute the robust marginal correlations (using the pairwise estimator cite{gnanadesikan_robust_1972} with the <span class="math inline">\(Q_n\)</span> scale estimator citep{rousseeuw_alternatives_1993}) of gene expressions with disease-free survival time and then select the 200 genes that have the largest robust pairwise correlation coefficients as predictors.</p>
+<div class="section level2">
+<h2 id="data-description">Data description<a class="anchor" aria-label="anchor" href="#data-description"></a>
+</h2>
+<p>To illustrate a real data application for a high dimensional
+settings, we use the Breast Cancer dataset citep{van_t_veer_gene_2002}
+as an example. There are 24,481 genes of 117 breast tumor patients in
+this dataset. For the 78 breast cancer patients with disease-free
+survival time, {for each of the genes the} <span class="math inline">\(\log_{10}(Intensity)\)</span>, <span class="math inline">\(\log_{10}(Ratio)\)</span> and p-value is given. We
+construct a regression model to select some important genes whose <span class="math inline">\(\log_{10}(Intensity)\)</span> are significantly
+related to the disease-free patient survival. For the sake of this, we
+regard the disease-free survival time as the response and use the <span class="math inline">\(\log_{10}(Intensity)\)</span>’s as predictors.</p>
+<p>It is assumed that only a few genes are associated with disease-free
+survival time. For very high dimensional datasets, usually we screen
+some variables first and then run variable selection based on the
+predictors we screened, such as in citet{bai_variable_2021}. Thus we
+first compute the robust marginal correlations (using the pairwise
+estimator cite{gnanadesikan_robust_1972} with the <span class="math inline">\(Q_n\)</span> scale estimator
+citep{rousseeuw_alternatives_1993}) of gene expressions with
+disease-free survival time and then select the 200 genes that have the
+largest robust pairwise correlation coefficients as predictors.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">y</span> <span class="op">=</span> <span class="va">breastcancer_screened</span><span class="op">$</span><span class="va">dat.surtime</span>
-<span class="va">x</span> <span class="op">=</span> <span class="va">breastcancer_screened</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span>
-
-<span class="va">corrs</span> <span class="op">=</span> <span class="fu"><a href="../reference/covf.html">covf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, cor.method <span class="op">=</span> <span class="st">"pair"</span>, pda.method <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">cormatrix</span>
-<span class="fu"><a href="https://rdrr.io/pkg/corrplot/man/corrplot.html">corrplot</a></span><span class="op">(</span><span class="va">corrs</span>, method <span class="op">=</span> <span class="st">"shade"</span>,shade.col <span class="op">=</span> <span class="cn">NA</span>, tl.col <span class="op">=</span><span class="st">"black"</span>, tl.srt <span class="op">=</span> <span class="fl">45</span>, order <span class="op">=</span> <span class="st">"FPC"</span>,tl.cex <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></code></pre></div>
-<p><img src="breastcancer_files/figure-html/analysis-1.png" width="700"></p>
+<span class="va">x</span> <span class="op">=</span> <span class="va">breastcancer_screened</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">+</span><span class="fl">2</span><span class="op">]</span>
+<span class="co">#corrs = covf(as.matrix(x), scale.method = "qn", cor.method = "pair", pda.method = F)$cormatrix</span>
+<span class="co">#rownames(corrs) = colnames(corrs) = NULL</span>
+<span class="co">#corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.pos = "n", order = "FPC")</span></code></pre></div>
 </div>
-<div id="outlier-detection" class="section level1">
-<h1 class="hasAnchor">
-<a href="#outlier-detection" class="anchor"></a>Outlier detection</h1>
-<p>Outlier detection results of those predictors based on DDC citep{rousseeuw_detecting_2018} is shown in Figure ref{breastcancer}. Most cells are yellow, showing they are not detected as outliers. Cells are flagged as outlying (red and blue cells) if the observed value and predicted value differ too much. A red cell means the observed value is larger than the predicted value and a blue cell means the observed value is smaller than the predicted value significantly.</p>
+<div class="section level2">
+<h2 id="outlier-detection">Outlier detection<a class="anchor" aria-label="anchor" href="#outlier-detection"></a>
+</h2>
+<p>Outlier detection results of those predictors based on DDC
+citep{rousseeuw_detecting_2018} is shown in Figure ref{breastcancer}.
+Most cells are yellow, showing they are not detected as outliers. Cells
+are flagged as outlying (red and blue cells) if the observed value and
+predicted value differ too much. A red cell means the observed value is
+larger than the predicted value and a blue cell means the observed value
+is smaller than the predicted value significantly.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/cellWise/man/DDC.html">DDC</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/cellWise/man/DDC.html" class="external-link">DDC</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;  The input data has 78 rows and 200 columns.</span>
-<span class="fu"><a href="https://rdrr.io/pkg/cellWise/man/cellMap.html">cellMap</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">remX</span>, <span class="va">fit1</span><span class="op">$</span><span class="va">stdResid</span>, columnlabels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">" "</span>,<span class="fl">198</span><span class="op">)</span>,<span class="fl">200</span><span class="op">)</span>, rowlabels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">" "</span>,<span class="fl">76</span><span class="op">)</span>,<span class="fl">78</span><span class="op">)</span>, columnangle <span class="op">=</span> <span class="fl">0</span>,
-        rowtitle <span class="op">=</span> <span class="st">"Observations"</span>, columntitle <span class="op">=</span> <span class="st">"Genes"</span>, sizetitles <span class="op">=</span> <span class="fl">2</span>,adjustrowlabels <span class="op">=</span> <span class="fl">0.5</span>, adjustcolumnlabels <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></code></pre></div>
-<p><img src="breastcancer_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<span class="co">#&gt;  The input data has 78 rows and 100 columns.</span>
+<span class="fu"><a href="https://rdrr.io/pkg/cellWise/man/cellMap.html" class="external-link">cellMap</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">remX</span>, <span class="va">fit1</span><span class="op">$</span><span class="va">stdResid</span>, columnlabels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">" "</span>,<span class="fl">98</span><span class="op">)</span>,<span class="fl">100</span><span class="op">)</span>, rowlabels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">" "</span>,<span class="fl">76</span><span class="op">)</span>,<span class="fl">78</span><span class="op">)</span>, columnangle <span class="op">=</span> <span class="fl">0</span>,
+        rowtitle <span class="op">=</span> <span class="st">"Observations"</span>, columntitle <span class="op">=</span> <span class="st">"Genes"</span>, sizetitles <span class="op">=</span> <span class="fl">2</span>,adjustrowlabels <span class="op">=</span> <span class="fl">0.5</span>, adjustcolumnlabels <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span>
+   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,
+        axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,
+        axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>,
+        axis.title.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span>,
+        legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">14</span><span class="op">)</span>, <span class="co">#change legend title font size</span>
+        legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="breastcancer_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#ggsave("breastcancer.eps",width = 12,height = 6)</span></code></pre></div>
+<code class="sourceCode R">
+
+<span class="co">#ggsave("breastcancer.eps",width = 8,height = 6)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">indcells</span><span class="op">)</span><span class="op">/</span><span class="fl">7800</span>
+<span class="co">#&gt; [1] 0.04987179</span></code></pre></div>
 </div>
-<div id="variable-selection" class="section level1">
-<h1 class="hasAnchor">
-<a href="#variable-selection" class="anchor"></a>Variable selection</h1>
-<p>Given the high cellwise contamination, traditional variable selection methods such as Lasso, or rowwise robust variable selection methods may lead to misleading selection results. With this consideration, cellwise robust methods may have better solutions. A sparse regression model is fitted via Lasso, sLTS, sShootingS, ALRP and ALGR, seperately. All selected genes are sorted based on the their robust pairwise correlations with the survival time.</p>
+<div class="section level2">
+<h2 id="variable-selection">Variable selection<a class="anchor" aria-label="anchor" href="#variable-selection"></a>
+</h2>
+<p>Given the high cellwise contamination, traditional variable selection
+methods such as Lasso, or rowwise robust variable selection methods may
+lead to misleading selection results. With this consideration, cellwise
+robust methods may have better solutions. A sparse regression model is
+fitted via Lasso, sLTS, sShootingS, ALRP and ALGR, seperately. All
+selected genes are sorted based on the their robust pairwise
+correlations with the survival time.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
-
+<code class="sourceCode R"><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="va">lassofit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>, scale.method <span class="op">=</span> <span class="st">"sd"</span>, adaptive <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
-<span class="va">sLTSfit</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/robustHD/man/sparseLTS.html">sparseLTS</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>
-<span class="va">sssfit</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,<span class="va">y</span><span class="op">)</span>
-<span class="va">pairfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>,adaptive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
-<span class="va">gaussrankfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, adaptive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
-
-<span class="va">rst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/rbind.fill.html">rbind.fill</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
-  lasso <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">lassofit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-  slts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">sLTSfit</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-  sss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">sssfit</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-  gaussrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">gaussrankfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-  pair <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">pairfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">alassofit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>, scale.method <span class="op">=</span> <span class="st">"sd"</span>, adaptive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+<span class="va">sLTSfit</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/robustHD/man/sparseLTS.html" class="external-link">sparseLTS</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>
+<span class="va">sssfit</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,<span class="va">y</span><span class="op">)</span>
+<span class="va">lrpfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>,adaptive <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
+<span class="va">alrpfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>,adaptive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>
+<span class="va">lgrfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, adaptive <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>
+<span class="va">algrfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, adaptive <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<span class="va">rst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu">plyr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/plyr/man/rbind.fill.html" class="external-link">rbind.fill</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>
+  alrp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">alrpfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  lrp  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span> <span class="va">lrpfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  algr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">algrfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  lgr  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span> <span class="va">lgrfit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  alasso <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">alassofit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  lasso  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span> <span class="va">lassofit</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  slts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">sLTSfit</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+  sss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">as.logical</a></span><span class="op">(</span><span class="va">sssfit</span><span class="op">$</span><span class="va">coef</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+  
+  
 <span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">rst</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Lasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span>, <span class="st">"ALGR"</span>, <span class="st">"ALRP"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">rst</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALRP"</span>, <span class="st">"LRP"</span>, <span class="st">"ALGR"</span>, <span class="st">"LGR"</span>, <span class="st">"ALasso"</span>,<span class="st">"Lasso"</span>, <span class="st">"sLTS"</span>, <span class="st">"sShootingS"</span><span class="op">)</span>
 
-<span class="co"># save(rst,"breastcancer_result.Rdata")</span></code></pre></div>
+<span class="va">rst_tbl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">rst</span>, nrow <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+
+<span class="co"># write_csv(rst_tbl,"breastcancer_result.csv")</span></code></pre></div>
 </div>
   </div>
 
@@ -169,11 +211,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Peng Su, Garth Tarr, Samuel Mueller.</p>
+  <p></p>
+<p>Developed by Peng Su, Garth Tarr, Samuel Muller.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -181,6 +225,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -37,13 +37,12 @@ To illustrate a real data application for a high dimensional settings, we use th
 
 It is assumed that only a few genes are associated with disease-free survival time. For very high dimensional datasets, usually we screen some variables first and then run variable selection based on the predictors we screened, such as in citet{bai_variable_2021}. Thus we first compute the robust marginal correlations (using the pairwise estimator cite{gnanadesikan_robust_1972} with the $Q_n$ scale estimator citep{rousseeuw_alternatives_1993}) of gene expressions with disease-free survival time and then select the 200 genes that have the largest robust pairwise correlation coefficients as predictors.
 
-```{r analysis}
+```{r}
 y = breastcancer_screened$dat.surtime
-x = breastcancer_screened[,c(-1,-2)]
-
-corrs = covf(as.matrix(x), scale.method = "qn", cor.method = "pair", pda.method = F)$cormatrix
-corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.srt = 45, order = "FPC",tl.cex = 0.01)
-
+x = breastcancer_screened[,1:100+2]
+#corrs = covf(as.matrix(x), scale.method = "qn", cor.method = "pair", pda.method = F)$cormatrix
+#rownames(corrs) = colnames(corrs) = NULL
+#corrplot(corrs, method = "shade",shade.col = NA, tl.col ="black", tl.pos = "n", order = "FPC")
 ```
 
 # Outlier detection 
@@ -51,9 +50,18 @@ Outlier detection results of those predictors based on DDC citep{rousseeuw_detec
 
 ```{r}
 fit1 <- DDC(x)
-cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
-        rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)
-#ggsave("breastcancer.eps",width = 12,height = 6)
+cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",98),100), rowlabels = c(1,rep(" ",76),78), columnangle = 0,
+        rowtitle = "Observations", columntitle = "Genes", sizetitles = 2,adjustrowlabels = 0.5, adjustcolumnlabels = 0.5)+
+   theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        legend.title = element_text(size=14), #change legend title font size
+        legend.text = element_text(size=12))
+
+
+#ggsave("breastcancer.eps",width = 8,height = 6)
+length(fit1$indcells)/7800
 ```
 
 
@@ -61,26 +69,52 @@ cellMap(fit1$remX, fit1$stdResid, columnlabels = c(1,rep(" ",198),200), rowlabel
 Given the high cellwise contamination, traditional variable selection methods such as Lasso, or rowwise robust variable selection methods may lead to misleading selection results. With this consideration, cellwise robust methods may have better solutions. A sparse regression model is fitted via Lasso, sLTS, sShootingS, ALRP and ALGR, seperately. All selected genes are sorted based on the their robust pairwise correlations with the survival time.
 
 ```{r}
-x = x[,sort(names(x))]
-
+x = as.matrix(x[,sort(names(x))])
 lassofit = covlasso(x,y,cor.method = "pearson", scale.method = "sd", adaptive = F)
+alassofit = covlasso(x,y,cor.method = "pearson", scale.method = "sd", adaptive = T)
 sLTSfit = sparseLTS(x,y)
 sssfit = sparseshooting(as.matrix(x),y)
-pairfit = covlasso(x,y,cor.method = "pair", scale.method = "qn",adaptive = T)
-gaussrankfit = covlasso(x,y,cor.method = "gaussrank", scale.method = "qn", adaptive = T)
+lrpfit = covlasso(x,y,cor.method = "pair", scale.method = "qn",adaptive = F)
+alrpfit = covlasso(x,y,cor.method = "pair", scale.method = "qn",adaptive = T)
+lgrfit = covlasso(x,y,cor.method = "gaussrank", scale.method = "qn", adaptive = F)
+algrfit = covlasso(x,y,cor.method = "gaussrank", scale.method = "qn", adaptive = T)
+```
 
+```{r}
+x = as.data.frame(x)
 rst = t(plyr::rbind.fill(list(
-  lasso = data.frame(t(sort(names(x)[as.logical(lassofit$betahat_opt)]))),
+  alrp = data.frame(t(sort(names(x)[as.logical(alrpfit$betahat_opt)]))),
+  lrp  = data.frame(t(sort(names(x)[as.logical( lrpfit$betahat_opt)]))),
+  algr = data.frame(t(sort(names(x)[as.logical(algrfit$betahat_opt)]))),
+  lgr  = data.frame(t(sort(names(x)[as.logical( lgrfit$betahat_opt)]))),
+  alasso = data.frame(t(sort(names(x)[as.logical(alassofit$betahat_opt)]))),
+  lasso  = data.frame(t(sort(names(x)[as.logical( lassofit$betahat_opt)]))),
   slts = data.frame(t(sort(names(x)[as.logical(sLTSfit$coefficients[-1])]))),
-  sss = data.frame(t(sort(names(x)[as.logical(sssfit$coef[-1])]))),
-  gaussrank = data.frame(t(sort(names(x)[as.logical(gaussrankfit$betahat_opt)]))),
-  pair = data.frame(t(sort(names(x)[as.logical(pairfit$betahat_opt)])))
+  sss = data.frame(t(sort(names(x)[as.logical(sssfit$coef[-1])])))
+  
+  
 )))
 
-colnames(rst) = c("Lasso", "sLTS", "sShootingS", "ALGR", "ALRP")
+colnames(rst) = c("ALRP", "LRP", "ALGR", "LGR", "ALasso","Lasso", "sLTS", "sShootingS")
 
-# save(rst,"breastcancer_result.Rdata")
+rst_tbl = as.data.frame(t(matrix(rst, nrow = 6)))
+
+# write_csv(rst_tbl,"breastcancer_result.csv")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

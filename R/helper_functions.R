@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' x = matrix(rnorm(100), ncol = 10)
-#' paircorf(x)
+#' covf(x)
 #'
 covf = function(x, cor.method, scale.method, pda.method, lmin = NULL){
 
@@ -188,6 +188,50 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5,
 
 }
 
+
+
+
+
+
+
+
+#' Grid_arrange_shared_legend
+#'
+#' @param ...
+#' @param ncol
+#' @param nrow
+#' @param position
+#'
+#' @return
+#' @export
+#'
+grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
+
+  plots <- list(...)
+  position <- match.arg(position)
+  g <- ggplot2::ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
+  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+  lheight <- sum(legend$height)
+  lwidth <- sum(legend$width)
+  gl <- lapply(plots, function(x) x + theme(legend.position="none"))
+  gl <- c(gl, ncol = ncol, nrow = nrow)
+
+  combined <- switch(position,
+                     "bottom" = arrangeGrob(do.call(arrangeGrob, gl),
+                                            legend,
+                                            ncol = 1,
+                                            heights = unit.c(unit(1, "npc") - lheight, lheight)),
+                     "right" = arrangeGrob(do.call(arrangeGrob, gl),
+                                           legend,
+                                           ncol = 2,
+                                           widths = unit.c(unit(1, "npc") - lwidth, lwidth)))
+
+  grid::grid.newpage()
+  grid::grid.draw(combined)
+  # return gtable invisibly
+  invisible(combined)
+
+}
 
 
 

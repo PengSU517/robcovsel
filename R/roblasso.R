@@ -80,6 +80,9 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
   sigmapf = function(beta){(t(response-predictor%*%beta)%*%(response-predictor%*%beta))*ifelse(std,scale[1]^2,1)}
   sigma2hat = apply(betahat, 2, sigmapf)
 
+  #beta0f = function(beta){((mean(y) - colMeans(x)%*%beta))*ifelse(std,scale[1]^2,1)}
+  #beta0hat = apply(betahat, 2, beta0f)
+
   if(std){betahat = (scale[1]*(betahat)/scale[-1])}
 
   penal = apply(betahat, 2, function(betahat){sum(as.logical(betahat))})
@@ -90,12 +93,14 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
   label = which.min(bic)
   bic_opt = bic[label]
   lambda_opt = lambda[label-1]
+  #beta0hat_opt = beta0hat[label]
   betahat_opt = betahat[label,]
   sigma2hat_opt = sigma2hat[label]
 
-  list(lambda = lambda, betahat = betahat, sigma2hat = sigma2hat, bic = bic,
+  list(lambda = lambda, betahat = betahat, sigma2hat = sigma2hat, penal = penal, bic = bic,
        covmatrix = covmatrix, cormatrix = cormatrix, scale = scale,
        cor.method = cor.method, scale.method = scale.method, pda.method = pda.method,
        lmin = lmin, std = std, adaptive = adaptive,
-       lambda_opt = lambda_opt, betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
+       lambda_opt = lambda_opt, #beta0hat_opt = beta0hat_opt,
+       betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
 }

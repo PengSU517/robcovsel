@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">robcovsel</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -78,7 +74,7 @@
 
       
 
-      </header><script src="demo_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>demo</h1>
@@ -95,71 +91,55 @@
 <code class="sourceCode R"><span class="co">#remotes::install_github("PengSU517/robcovsel")</span>
 <span class="co">#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!</span>
 <span class="co">#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">shootings</span><span class="op">)</span></code></pre></div>
-<div id="data-generation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#data-generation" class="anchor"></a>Data generation</h1>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">shootings</span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="data-generation">Data generation<a class="anchor" aria-label="anchor" href="#data-generation"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gen</span> <span class="op">=</span> <span class="fu"><a href="../reference/genevar.html">genevar</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fl">10</span>, e <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
 <span class="va">x</span> <span class="op">=</span> <span class="va">gen</span><span class="op">$</span><span class="va">x</span>
 <span class="va">y</span> <span class="op">=</span> <span class="va">gen</span><span class="op">$</span><span class="va">y</span></code></pre></div>
 </div>
-<div id="test" class="section level1">
-<h1 class="hasAnchor">
-<a href="#test" class="anchor"></a>test</h1>
+<div class="section level2">
+<h2 id="test">test<a class="anchor" aria-label="anchor" href="#test"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>  <span class="co">#ALRP</span>
+<code class="sourceCode R">
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>  
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;    0.05    0.01    0.07</span>
-<span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit2</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="co">#ALGR</span>
+<span class="co">#&gt;   0.122   0.004   0.136</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit2</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;    0.01    0.00    0.01</span>
-<span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit3</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="co">#sparse shooting S</span>
+<span class="co">#&gt;   0.007   0.000   0.007</span>
+<span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit3</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span>
+<span class="co">#&gt; Warning: replacing previous import 'lifecycle::last_warnings' by</span>
+<span class="co">#&gt; 'rlang::last_warnings' when loading 'tibble'</span>
+<span class="co">#&gt; Warning: replacing previous import 'lifecycle::last_warnings' by</span>
+<span class="co">#&gt; 'rlang::last_warnings' when loading 'pillar'</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;    3.93    0.10    4.04</span>
+<span class="co">#&gt;   1.884   0.060   2.003</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; lm(formula = y ~ x)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Residuals:</span>
-<span class="co">#&gt;      Min       1Q   Median       3Q      Max </span>
-<span class="co">#&gt; -13.4120  -2.1355  -0.0745   2.6851   9.3380 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;              Estimate Std. Error t value Pr(&gt;|t|)  </span>
-<span class="co">#&gt; (Intercept) -0.560595   0.419921  -1.335   0.1853  </span>
-<span class="co">#&gt; x1           0.001875   0.133633   0.014   0.9888  </span>
-<span class="co">#&gt; x2           0.144389   0.133338   1.083   0.2818  </span>
-<span class="co">#&gt; x3           0.280272   0.137843   2.033   0.0450 *</span>
-<span class="co">#&gt; x4           0.345303   0.142396   2.425   0.0173 *</span>
-<span class="co">#&gt; x5           0.015219   0.130046   0.117   0.9071  </span>
-<span class="co">#&gt; x6           0.123071   0.127064   0.969   0.3354  </span>
-<span class="co">#&gt; x7           0.256944   0.139388   1.843   0.0686 .</span>
-<span class="co">#&gt; x8          -0.175958   0.139822  -1.258   0.2115  </span>
-<span class="co">#&gt; x9          -0.129883   0.130713  -0.994   0.3231  </span>
-<span class="co">#&gt; x10         -0.076777   0.128822  -0.596   0.5527  </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Residual standard error: 4.111 on 89 degrees of freedom</span>
-<span class="co">#&gt; Multiple R-squared:  0.1952, Adjusted R-squared:  0.1047 </span>
-<span class="co">#&gt; F-statistic: 2.158 on 10 and 89 DF,  p-value: 0.02771</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">~</span><span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="va">coe</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>
-<span class="co">#&gt;           x1           x2           x3           x4           x5           x6 </span>
-<span class="co">#&gt;  0.001874802  0.144389352  0.280272182  0.345302696  0.015218948  0.123071205 </span>
-<span class="co">#&gt;           x7           x8           x9          x10 </span>
-<span class="co">#&gt;  0.256944344 -0.175958000 -0.129883185 -0.076776803</span>
-<span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">%*%</span><span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/ginv.html">ginv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">%*%</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html">cov</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>
-<span class="co">#&gt;          [,1]</span>
-<span class="co">#&gt; [1,] 15.19068</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pearson"</span>,scale.method <span class="op">=</span> <span class="st">"sd"</span>, pda.method <span class="op">=</span> <span class="cn">F</span><span class="op">)</span><span class="op">$</span><span class="va">betahat</span>,<span class="fl">1</span><span class="op">)</span>
-<span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]       [,5]      [,6]      [,7]</span>
-<span class="co">#&gt; 10 0.001874802 0.1443894 0.2802722 0.3453027 0.01521895 0.1230712 0.2569443</span>
-<span class="co">#&gt;         [,8]       [,9]      [,10]</span>
-<span class="co">#&gt; 10 -0.175958 -0.1298832 -0.0767768</span></code></pre></div>
+<span class="va">fit1</span><span class="op">$</span><span class="va">pda.method</span>
+<span class="co">#&gt; [1] "nearpd"</span>
+<span class="va">fit1</span><span class="op">$</span><span class="va">adaptive</span>
+<span class="co">#&gt; [1] TRUE</span>
+<span class="va">fit1</span><span class="op">$</span><span class="va">lmin</span>
+<span class="co">#&gt; [1] 0.303827</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.6038418 1.0923205 1.2228418 1.1176299 0.6153366 0.0000000</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">500131</span><span class="op">)</span>
+<span class="va">dataset1</span> <span class="op">=</span> <span class="fu"><a href="../reference/genevar.html">genevar</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fl">200</span>, e <span class="op">=</span> <span class="fl">0.1</span>, gamma <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+<span class="va">fit12</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">dataset1</span><span class="op">$</span><span class="va">x</span>,<span class="va">dataset1</span><span class="op">$</span><span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span>
+
+
+<span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/covf.html">covf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">dataset1</span><span class="op">$</span><span class="va">y</span>,<span class="va">dataset1</span><span class="op">$</span><span class="va">x</span><span class="op">)</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>, scale.method <span class="op">=</span> <span class="st">"qn"</span>, pda.method <span class="op">=</span> <span class="st">"nearpd"</span><span class="op">)</span>
+<span class="va">Sigma</span> <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">cormatrix</span>
+<span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Sigma</span><span class="op">)</span>
+<span class="co">#&gt; [1] 201 201</span>
+<span class="va">eigenrst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen</a></span><span class="op">(</span><span class="va">Sigma</span><span class="op">)</span>
+<span class="va">Sigmasqrt</span> <span class="op">=</span> <span class="op">(</span><span class="va">eigenrst</span><span class="op">$</span><span class="va">vectors</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">eigenrst</span><span class="op">$</span><span class="va">values</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">eigenrst</span><span class="op">$</span><span class="va">vectors</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 
@@ -174,11 +154,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Peng Su, Garth Tarr, Samuel Mueller.</p>
+  <p></p>
+<p>Developed by Peng Su, Garth Tarr, Samuel Muller.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -186,6 +168,8 @@
 
   
 
+
+  
 
   </body>
 </html>

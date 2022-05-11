@@ -17,43 +17,13 @@ knitr::opts_chunk$set(
 #https://pengsu517.github.io/robcovsel
 ```
 
-# System settings
-```{r setup}
-#########system settings
-#remotes::install_github("PengSU517/robcovsel")
-#remotes::install_github("PengSU517/shootings") !!!!!!!!!!!!!!
-#this shootings package is constructed based on ineswilms/sparse-shooting-S
-#rm(list = ls()) # clean slate
-#setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-
-#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.
-# rm(list = ls()) # clean slate
-# setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-```
-
-```{r parallel computation settings}
-#library(doParallel)
-#registerDoParallel(cores=8)
-#getDoParWorkers()
-
-# to prevent automatic parallel computation when doing linear algebra (OpenBLAS)
-#library(inline)
-#openblas.set.num.threads <- cfunction( signature(ipt="integer"),
-#                                         body = 'openblas_set_num_threads(*ipt);',
-#                                         otherdefs = c ('extern void penblas_set_num_threads(int);'),
-#                                         libargs = c #('/usr/lib/x86_64-linux-gnu/openblas/libblas.so.3'),
-#                                         language = "C",
-#                                         convention = ".C")
-#openblas.set.num.threads(1) 
-```
-
 # Data generation settings 
 
 Consider the linear regression model 
 $$
 y_i = \mathbf{x}_i^\top \pmb{\beta} + \varepsilon_i, i = 1,\ldots, n,
 $$
-in our simulations, we set $n = 100$, $p = 20$, $\pmb\beta = (1,2,1,2,1, \pmb 0_{p-5}^\top )^\top$, $\mathbf{x}_i$ is sampled from $N(\pmb 0,\pmb\Sigma_{xx})$ and $\varepsilon_i$ is sampled from $N(0,0.5^2)$. The correlation structure among variables is given by $\Sigma _{ij} = \rho^{|i-j|}$ and we set $\rho = 0.5$. 
+in our simulations, we set $n = 100$, $p = 20$, $\pmb\beta = (1,2,1,2,1, \pmb 0_{p-5}^\top )^\top$, $\mathbf{x}_i$ is sampled from $N(\pmb 0,\pmb\Sigma_{xx})$ and $\varepsilon_i$ is sampled from $N(0,1^2)$. The correlation structure among variables is given by $\Sigma _{ij} = \rho^{|i-j|}$ and we set $\rho = 0.1, 0.5, 0.5, 0.7, 0.9$, seperately. 
 
 Contamination proportions are set as $ 2\%$, $5\%$ and $10\%$ for all predictors separately. Outlying cells of all variables are randomly generated from $0.5 N(\gamma, 1)+ 0.5N(-\gamma, 1)$. We vary $\gamma$ over the set $\{0,2,4,6,8,10\}$ to simulate outliers with different magnitudes. When we apply appropriate $\gamma$'s, those cells will be outlying cells but not not necessarily marginal outliers.
 
@@ -64,72 +34,114 @@ $$
 where TP {denotes} the true positive number, FP the false postive number and FN the false negative number, respectively. We run $1,000$ simulations for each scenario and use the average TPR, FPR and $\mathrm{F_1}$ score to measure the performance of each method.
 
 
-# Visualization
-```{r analysis}
 
+```{r}
 library(tidyverse)
 library(gridExtra)
 library(grid)
-library(robcovsel)
-load("result_simu_p200.RData")
-
-result1 = as.data.frame(t(as.data.frame(result)))
-result1 = result1[complete.cases(result1),]
-result1 = result1 %>% mutate(tp = as.numeric(tp), fp = as.numeric(fp), gamma = as.numeric(gamma), p = as.numeric(p), fn = 5-tp, tn = p-5-fp, f1 = tp/(tp + 0.5*(fp+fn)), f1 = tp/(tp+0.5*(fp+fn)))
-#mcc = ((tp*tn + fp*fn)/sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn)))
-
-summary = result1 %>% group_by(n,p,e,r,gamma,mtd) %>% summarise(
-  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/(p-5), na.rm = T), F1 = mean(f1))%>%ungroup()
-summary = summary %>% mutate(Method = factor(mtd, levels = c("ALRP",  "ALGR", "LRP",  "LGR", "sShootingS", "sLTS", "aLasso", "Lasso")))
-summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
-summary$r = factor(summary$r, labels = c("r = 0.5","r = 0.7","r = 0.9"))
-summary1 = summary %>% filter(r == "r = 0.9")
-
 ```
 
 
+
+# Visualization 
 ```{r}
-p1 = ggplot(data = summary1, aes(x = gamma,y = F1, color = Method ))+
-  geom_line()+geom_point()+facet_grid(.~e) +
-  scale_x_continuous(breaks=seq(0,12,2)) +
-  labs(fill = "", x = expression(gamma*": magnitude of outlyingness"), y = expression(F[1]))+ 
-  guides(fill = guide_legend(title = "Thresholds")) +
-  theme_light() +
-  theme(text= element_text(size=20), legend.position = "bottom")
+#data(result_simu_p20_tidy)
+#library(tidyverse)
 
-p2 = ggplot(data = summary1, aes(x = gamma,y = TPR, color = Method ))+
-  geom_line()+geom_point()+facet_grid(.~e) +
-  scale_x_continuous(breaks=seq(0,12,2)) +
-  ylim(0,1) +
-  labs(fill = "", x = "")+ 
-  guides(fill = guide_legend(title = "Thresholds")) +
-  theme_light() +
-  theme(text= element_text(size=20), legend.position = "bottom")
 
-p3 = ggplot(data = summary1, aes(x = gamma,y = FPR, color = Method ))+
-  geom_line()+geom_point()+facet_grid(.~e) +
-  scale_x_continuous(breaks=seq(0,12,2)) +
-  ylim(0,1) +
-  labs(fill = "", x = "")+ 
-  guides(fill = guide_legend(title = "Thresholds")) +
-  theme_light() +
-  theme(text= element_text(size=20), legend.position = "bottom")
+#summaryp20 = result1 %>% group_by(n,p,e,r,gamma,mtd) %>% summarise(
+#  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/(p-5), na.rm = T), F1 = mean(f1))%>%ungroup()
+#save(summaryp20, file = "summaryp20.RData")
+
+data("summaryp20")
+summary = summaryp20
+
+##summary = result1 %>% group_by(n,p,e,r,gamma,mtd) %>% summarise(
+##  TPR = mean(tp/5, na.rm = T),FPR = mean(fp/(p-5), na.rm = T), F1 = mean(f1))%>%ungroup()
+summary$e = factor(summary$e, labels = c("e = 2%","e = 5%","e = 10%"))
+summary$r = as.numeric(summary$r)
+summary1 = summary %>% filter(gamma %in% c(2,6,10))
+summary1$gamma = factor(summary1$gamma, labels = c("Small outlier", "Medium outlier", "Large outlier"))
+summary1 = summary1 %>% mutate(Method = factor(mtd, levels = c("ALRP",  "LRP", "ALGR",  "LGR", "aLasso", "Lasso", "sShootingS", "sLTS")))
+summary1$Method = factor(summary1$Method, labels = c("ALRP",  "LRP", "ALGR",  "LGR", "ALasso", "Lasso", "sShootingS", "sLTS"))
+
+summary1 = summary1 %>% mutate(adaptive = as.factor(grepl("A", Method)), mtdtype = 1*grepl("LRP", Method) + 2*grepl("LGR", Method) + 3*grepl("Lasso", Method) + 4*grepl("sShootingS", Method) + 5*grepl("sLTS", Method), mtdtype = as.factor(mtdtype))
+#glimpse(summary1)
+
+summary1$adaptive = factor(summary1$adaptive, levels = c("TRUE", "FALSE"))
 
 ```
 
 
-```{r  fig.width=10, fig.height=10}
+```{r  fig.width=10, fig.height=10, echo=FALSE}
+p1 = ggplot(data = summary1, aes(x = r,y = F1))+
+  geom_line(aes(linetype = Method, color = Method))+ 
+  geom_point(aes(shape = Method, color = Method)) + 
+  scale_color_manual(values=c("red", "red", "orange", "orange","green", "green", "blue", "purple"))+
+  scale_linetype_manual(values=c("solid", "dashed", "solid", "dashed","solid", "dashed", "dashed", "dashed"))+ 
+  scale_shape_manual(values = c(16,1,16,1,16,1,1,1))+
+  facet_grid(gamma~e) +
+  scale_x_continuous(breaks=seq(0.1,0.9,0.2)) +
+  labs(fill = "", x = "r: correlation coefficient", y = expression(F[1]))+ 
+  guides(fill = guide_legend(title = "Thresholds")) +
+  theme_light() +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        legend.title = element_text(size=14), #change legend title font size
+        legend.text = element_text(size=12),
+        strip.text = element_text(size = 12))+
+  
+  theme(text= element_text(size=20), legend.position = "bottom")
+
 p1
+
+
+#ggsave("plots_20.eps", plot = p3, width = 10,height = 9)
+```
+
+
+```{r  fig.width=10, fig.height=10, echo=FALSE}
+p2 = ggplot(data = summary1, aes(x = r,y = TPR))+
+  geom_line(aes(linetype = Method, color = Method))+ 
+  geom_point(aes(shape = Method, color = Method)) + 
+  scale_color_manual(values=c("red", "red", "orange", "orange","green", "green", "blue", "purple"))+
+  scale_linetype_manual(values=c("solid", "dashed", "solid", "dashed","solid", "dashed", "dashed", "dashed"))+ 
+  scale_shape_manual(values = c(1:8))+
+  facet_grid(gamma~e) +
+  scale_x_continuous(breaks=seq(0.1,0.9,0.2)) +
+  labs(fill = "", x = "r: correlation coefficient", y = "TPR")+ 
+  guides(fill = guide_legend(title = "Thresholds")) +
+  theme_light() +
+  
+  theme(text= element_text(size=20), legend.position = "bottom")
 
 p2
 
+
+#ggsave("plots_200_tpr.eps", plot = p2, width = 10,height = 9)
+```
+
+```{r  fig.width=10, fig.height=10, echo=FALSE}
+p3 = ggplot(data = summary1, aes(x = r,y = FPR))+
+  geom_line(aes(linetype = Method, color = Method))+ 
+  geom_point(aes(shape = Method, color = Method)) + 
+  scale_color_manual(values=c("red", "red", "orange", "orange","green", "green", "blue", "purple"))+
+  scale_linetype_manual(values=c("solid", "dashed", "solid", "dashed","solid", "dashed", "dashed", "dashed"))+ 
+  scale_shape_manual(values = c(1:8))+
+  facet_grid(gamma~e) +
+  scale_x_continuous(breaks=seq(0.1,0.9,0.2)) +
+  labs(fill = "", x = "r: correlation coefficient", y = "FPR")+ 
+  guides(fill = guide_legend(title = "Thresholds")) +
+  theme_light() +
+  
+  theme(text= element_text(size=20), legend.position = "bottom")
+
 p3
 
-ggsave("plots_20_f1.eps", plot = p1, width = 10,height = 8)
 
-ggsave("plots_20_tpr.eps", plot = p2, width = 10,height = 8)
-
-ggsave("plots_20_fpr.eps", plot = p3, width = 10,height = 8)
+#ggsave("plots_200_fpr.eps", plot = p3, width = 10,height = 9)
 ```
 
 
@@ -137,67 +149,3 @@ ggsave("plots_20_fpr.eps", plot = p3, width = 10,height = 8)
 
 
 
-
-
-
-
-
-```{r fig.width=10, fig.height=10}
-grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
-  
-  plots <- list(...)
-  position <- match.arg(position)
-  g <- ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
-  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
-  lheight <- sum(legend$height)
-  lwidth <- sum(legend$width)
-  gl <- lapply(plots, function(x) x + theme(legend.position="none"))
-  gl <- c(gl, ncol = ncol, nrow = nrow)
-  
-  combined <- switch(position,
-                     "bottom" = arrangeGrob(do.call(arrangeGrob, gl),
-                                            legend,
-                                            ncol = 1,
-                                            heights = unit.c(unit(1, "npc") - lheight, lheight)),
-                     "right" = arrangeGrob(do.call(arrangeGrob, gl),
-                                           legend,
-                                           ncol = 2,
-                                           widths = unit.c(unit(1, "npc") - lwidth, lwidth)))
-  
-  grid.newpage()
-  grid.draw(combined)
-  # return gtable invisibly
-  invisible(combined)
-  
-}
-
-
-pp = grid_arrange_shared_legend(p1,p2,p3, nrow = 3, ncol = 1, position = "bottom")
-ggsave("plots_200_r09.eps", plot = pp, width = 10,height = 10)
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-   
