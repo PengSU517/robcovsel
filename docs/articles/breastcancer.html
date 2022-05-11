@@ -78,7 +78,7 @@
 <span class="co">#This shootings package is not my original work. The functions in this package were forked from https://github.com/ineswilms/sparse-shooting-S. I constructed a package of those functions to make them more convenient to use.</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robcovsel</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">robustHD</span><span class="op">)</span> <span class="co">#sparse LTS</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/aalfons/robustHD" class="external-link">robustHD</a></span><span class="op">)</span> <span class="co">#sparse LTS</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">shootings</span><span class="op">)</span> <span class="co"># sparse shooting S</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cellWise</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot" class="external-link">corrplot</a></span><span class="op">)</span>
@@ -195,20 +195,20 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 10           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 11           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 12           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 13       AL162078 Contig35537_RC Contig37028_RC Contig38966_RC Contig40406_RC</span>
-<span class="co">#&gt; 14 Contig48328_RC Contig57357_RC    Contig62306 Contig64630_RC         M94046</span>
-<span class="co">#&gt; 15      NM_001616      NM_001830      NM_002442      NM_002824      NM_003125</span>
-<span class="co">#&gt; 16      NM_004052      NM_004618      NM_005785      NM_013437      NM_014706</span>
-<span class="co">#&gt; 17           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 13       AJ236885       AL162078 Contig35537_RC Contig37028_RC Contig38966_RC</span>
+<span class="co">#&gt; 14 Contig45347_RC Contig48328_RC Contig57357_RC    Contig62306 Contig64630_RC</span>
+<span class="co">#&gt; 15      NM_000907      NM_001616      NM_001830      NM_002442      NM_002824</span>
+<span class="co">#&gt; 16      NM_003860      NM_004052      NM_004618      NM_005785      NM_013437</span>
+<span class="co">#&gt; 17      NM_016083           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 18           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 19           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 20           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 21           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 22           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 23           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 24           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;       AL162078</span>
-<span class="co">#&gt; 25 Contig48328_RC Contig54956_RC Contig55181_RC         M94046      NM_001616</span>
-<span class="co">#&gt; 26           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 24           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 25       AL162078 Contig22786_RC Contig48328_RC Contig54956_RC Contig55181_RC</span>
+<span class="co">#&gt; 26      NM_001616      NM_006301           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 27           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 28           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 29           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
@@ -218,10 +218,10 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 33           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 34           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 35           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 36           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;       AL162078 Contig19451_RC</span>
-<span class="co">#&gt; 37 Contig48328_RC Contig54893_RC Contig54956_RC Contig55181_RC Contig57357_RC</span>
-<span class="co">#&gt; 38      NM_001616      NM_005785      NM_005881      NM_006301           &lt;NA&gt;</span>
-<span class="co">#&gt; 39           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 36           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 37       AL162078 Contig19451_RC Contig45347_RC Contig48328_RC Contig54893_RC</span>
+<span class="co">#&gt; 38 Contig55181_RC Contig57357_RC         M94046      NM_001616      NM_005785</span>
+<span class="co">#&gt; 39      NM_006301           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 40           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 41           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 42           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
@@ -230,8 +230,8 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 45           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 46           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 47           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 48           &lt;NA&gt;           &lt;NA&gt;       AB029009       AL162078 Contig36859_RC</span>
-<span class="co">#&gt; 49         M94046      NM_006301           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 48           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 49       AB029009       AL162078 Contig36859_RC Contig48328_RC         M94046</span>
 <span class="co">#&gt; 50           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 51           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 52           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
@@ -242,9 +242,9 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 57           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 58           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 59           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 60           &lt;NA&gt;       AL162078 Contig37063_RC Contig42740_RC Contig48328_RC</span>
-<span class="co">#&gt; 61 Contig55181_RC Contig57357_RC         M94046      NM_001673      NM_005881</span>
-<span class="co">#&gt; 62      NM_016390           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 60           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 61       AL162078 Contig37063_RC Contig42740_RC Contig48328_RC Contig54956_RC</span>
+<span class="co">#&gt; 62 Contig57357_RC         M94046      NM_001673      NM_005881      NM_006301</span>
 <span class="co">#&gt; 63           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 64           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 65           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
@@ -254,11 +254,11 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 69           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 70           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 71           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 72 Contig31424_RC Contig37063_RC Contig38966_RC Contig40406_RC Contig42006_RC</span>
-<span class="co">#&gt; 73 Contig48328_RC Contig50846_RC Contig54893_RC    Contig56229 Contig57357_RC</span>
-<span class="co">#&gt; 74         M94046      NM_001616      NM_001673      NM_003862      NM_004052</span>
-<span class="co">#&gt; 75      NM_006752      NM_014706      NM_016390           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 76           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 72           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 73       AB002369     Contig1408 Contig14797_RC Contig31424_RC Contig37063_RC</span>
+<span class="co">#&gt; 74    Contig62306         M94046      NM_001616      NM_001673      NM_001861</span>
+<span class="co">#&gt; 75      NM_003245      NM_003862      NM_004052      NM_004427      NM_004618</span>
+<span class="co">#&gt; 76      NM_013437      NM_014908      NM_020974           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 77           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 78           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 79           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
@@ -266,18 +266,19 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 81           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 82           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
 <span class="co">#&gt; 83           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="co">#&gt; 84       AB029009       AB040942       AB040971       AF070605       AF155652</span>
-<span class="co">#&gt; 85       AK001044       AL137362       AL137527       AL162078     Contig1408</span>
-<span class="co">#&gt; 86 Contig19451_RC Contig28947_RC Contig29141_RC Contig30146_RC Contig31312_RC</span>
-<span class="co">#&gt; 87 Contig35537_RC Contig36859_RC Contig37028_RC Contig37063_RC Contig41521_RC</span>
-<span class="co">#&gt; 88 Contig43169_RC Contig48328_RC Contig48472_RC Contig50846_RC Contig52620_RC</span>
-<span class="co">#&gt; 89 Contig54956_RC Contig55181_RC    Contig56229 Contig57521_RC    Contig62306</span>
-<span class="co">#&gt; 90         M94046      NM_000915      NM_001616      NM_001643      NM_001673</span>
-<span class="co">#&gt; 91      NM_001826      NM_001830      NM_001861      NM_001905      NM_002442</span>
-<span class="co">#&gt; 92      NM_003125      NM_003245      NM_003860      NM_003992      NM_004618</span>
-<span class="co">#&gt; 93      NM_005785      NM_005881      NM_006301      NM_006305      NM_006752</span>
-<span class="co">#&gt; 94      NM_013437      NM_014347      NM_014519      NM_014675      NM_014908</span>
-<span class="co">#&gt; 95      NM_016083      NM_016390      NM_016434      NM_020974       AL162078</span>
+<span class="co">#&gt; 84           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 85       AB002369       AB029009       AB040942       AF070605       AF155652</span>
+<span class="co">#&gt; 86       AK001044       AL137362       AL137527       AL162078     Contig1408</span>
+<span class="co">#&gt; 87 Contig19451_RC Contig29141_RC Contig30146_RC Contig31312_RC Contig31424_RC</span>
+<span class="co">#&gt; 88 Contig37028_RC Contig37063_RC Contig40406_RC Contig41521_RC Contig43169_RC</span>
+<span class="co">#&gt; 89 Contig48328_RC Contig48472_RC Contig50846_RC Contig52620_RC Contig54893_RC</span>
+<span class="co">#&gt; 90 Contig55181_RC    Contig56229 Contig57521_RC    Contig62306 Contig64630_RC</span>
+<span class="co">#&gt; 91  Contig8862_RC         M94046      NM_000915      NM_001616      NM_001643</span>
+<span class="co">#&gt; 92      NM_001720      NM_001826      NM_001830      NM_001861      NM_001905</span>
+<span class="co">#&gt; 93      NM_002824      NM_003125      NM_003245      NM_003860      NM_003862</span>
+<span class="co">#&gt; 94      NM_004911      NM_005785      NM_005881      NM_006301      NM_006305</span>
+<span class="co">#&gt; 95      NM_012261      NM_013437      NM_014347      NM_014519      NM_014675</span>
+<span class="co">#&gt; 96      NM_014908      NM_015270      NM_016083      NM_016390      NM_016434</span>
 <span class="co">#&gt;                V6</span>
 <span class="co">#&gt; 1       NM_000907</span>
 <span class="co">#&gt; 2       NM_004618</span>
@@ -290,11 +291,11 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 9            &lt;NA&gt;</span>
 <span class="co">#&gt; 10           &lt;NA&gt;</span>
 <span class="co">#&gt; 11           &lt;NA&gt;</span>
-<span class="co">#&gt; 12       AJ236885</span>
-<span class="co">#&gt; 13 Contig45347_RC</span>
-<span class="co">#&gt; 14      NM_000907</span>
-<span class="co">#&gt; 15      NM_003860</span>
-<span class="co">#&gt; 16      NM_016083</span>
+<span class="co">#&gt; 12           &lt;NA&gt;</span>
+<span class="co">#&gt; 13 Contig40406_RC</span>
+<span class="co">#&gt; 14         M94046</span>
+<span class="co">#&gt; 15      NM_003125</span>
+<span class="co">#&gt; 16      NM_014706</span>
 <span class="co">#&gt; 17           &lt;NA&gt;</span>
 <span class="co">#&gt; 18           &lt;NA&gt;</span>
 <span class="co">#&gt; 19           &lt;NA&gt;</span>
@@ -302,8 +303,8 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 21           &lt;NA&gt;</span>
 <span class="co">#&gt; 22           &lt;NA&gt;</span>
 <span class="co">#&gt; 23           &lt;NA&gt;</span>
-<span class="co">#&gt; 24 Contig22786_RC</span>
-<span class="co">#&gt; 25      NM_006301</span>
+<span class="co">#&gt; 24           &lt;NA&gt;</span>
+<span class="co">#&gt; 25         M94046</span>
 <span class="co">#&gt; 26           &lt;NA&gt;</span>
 <span class="co">#&gt; 27           &lt;NA&gt;</span>
 <span class="co">#&gt; 28           &lt;NA&gt;</span>
@@ -314,9 +315,9 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 33           &lt;NA&gt;</span>
 <span class="co">#&gt; 34           &lt;NA&gt;</span>
 <span class="co">#&gt; 35           &lt;NA&gt;</span>
-<span class="co">#&gt; 36 Contig45347_RC</span>
-<span class="co">#&gt; 37         M94046</span>
-<span class="co">#&gt; 38           &lt;NA&gt;</span>
+<span class="co">#&gt; 36           &lt;NA&gt;</span>
+<span class="co">#&gt; 37 Contig54956_RC</span>
+<span class="co">#&gt; 38      NM_005881</span>
 <span class="co">#&gt; 39           &lt;NA&gt;</span>
 <span class="co">#&gt; 40           &lt;NA&gt;</span>
 <span class="co">#&gt; 41           &lt;NA&gt;</span>
@@ -326,8 +327,8 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 45           &lt;NA&gt;</span>
 <span class="co">#&gt; 46           &lt;NA&gt;</span>
 <span class="co">#&gt; 47           &lt;NA&gt;</span>
-<span class="co">#&gt; 48 Contig48328_RC</span>
-<span class="co">#&gt; 49           &lt;NA&gt;</span>
+<span class="co">#&gt; 48           &lt;NA&gt;</span>
+<span class="co">#&gt; 49      NM_006301</span>
 <span class="co">#&gt; 50           &lt;NA&gt;</span>
 <span class="co">#&gt; 51           &lt;NA&gt;</span>
 <span class="co">#&gt; 52           &lt;NA&gt;</span>
@@ -338,9 +339,9 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 57           &lt;NA&gt;</span>
 <span class="co">#&gt; 58           &lt;NA&gt;</span>
 <span class="co">#&gt; 59           &lt;NA&gt;</span>
-<span class="co">#&gt; 60 Contig54956_RC</span>
-<span class="co">#&gt; 61      NM_006301</span>
-<span class="co">#&gt; 62           &lt;NA&gt;</span>
+<span class="co">#&gt; 60           &lt;NA&gt;</span>
+<span class="co">#&gt; 61 Contig55181_RC</span>
+<span class="co">#&gt; 62      NM_016390</span>
 <span class="co">#&gt; 63           &lt;NA&gt;</span>
 <span class="co">#&gt; 64           &lt;NA&gt;</span>
 <span class="co">#&gt; 65           &lt;NA&gt;</span>
@@ -350,10 +351,10 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 69           &lt;NA&gt;</span>
 <span class="co">#&gt; 70           &lt;NA&gt;</span>
 <span class="co">#&gt; 71           &lt;NA&gt;</span>
-<span class="co">#&gt; 72 Contig45347_RC</span>
-<span class="co">#&gt; 73 Contig64630_RC</span>
-<span class="co">#&gt; 74      NM_006301</span>
-<span class="co">#&gt; 75           &lt;NA&gt;</span>
+<span class="co">#&gt; 72           &lt;NA&gt;</span>
+<span class="co">#&gt; 73 Contig40406_RC</span>
+<span class="co">#&gt; 74      NM_002312</span>
+<span class="co">#&gt; 75      NM_006752</span>
 <span class="co">#&gt; 76           &lt;NA&gt;</span>
 <span class="co">#&gt; 77           &lt;NA&gt;</span>
 <span class="co">#&gt; 78           &lt;NA&gt;</span>
@@ -361,19 +362,20 @@ correlations with the survival time.</p>
 <span class="co">#&gt; 80           &lt;NA&gt;</span>
 <span class="co">#&gt; 81           &lt;NA&gt;</span>
 <span class="co">#&gt; 82           &lt;NA&gt;</span>
-<span class="co">#&gt; 83       AB002369</span>
-<span class="co">#&gt; 84       AJ236885</span>
-<span class="co">#&gt; 85 Contig14797_RC</span>
-<span class="co">#&gt; 86 Contig31424_RC</span>
-<span class="co">#&gt; 87 Contig42740_RC</span>
-<span class="co">#&gt; 88 Contig54893_RC</span>
-<span class="co">#&gt; 89  Contig8862_RC</span>
-<span class="co">#&gt; 90      NM_001719</span>
-<span class="co">#&gt; 91      NM_002824</span>
-<span class="co">#&gt; 92      NM_004911</span>
-<span class="co">#&gt; 93      NM_012261</span>
-<span class="co">#&gt; 94      NM_015270</span>
-<span class="co">#&gt; 95 Contig37028_RC</span>
+<span class="co">#&gt; 83           &lt;NA&gt;</span>
+<span class="co">#&gt; 84           &lt;NA&gt;</span>
+<span class="co">#&gt; 85       AJ236885</span>
+<span class="co">#&gt; 86 Contig14797_RC</span>
+<span class="co">#&gt; 87 Contig36859_RC</span>
+<span class="co">#&gt; 88 Contig45917_RC</span>
+<span class="co">#&gt; 89 Contig54956_RC</span>
+<span class="co">#&gt; 90   Contig726_RC</span>
+<span class="co">#&gt; 91      NM_001719</span>
+<span class="co">#&gt; 92      NM_002442</span>
+<span class="co">#&gt; 93      NM_003992</span>
+<span class="co">#&gt; 94      NM_006752</span>
+<span class="co">#&gt; 95      NM_014894</span>
+<span class="co">#&gt; 96      NM_020974</span>
 
 <span class="co"># write_csv(rst_tbl,"breastcancer_result.csv")</span></code></pre></div>
 </div>
@@ -422,7 +424,8 @@ profiling predicts clinical outcome of breast cancer. Nature,
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
     </footer>
