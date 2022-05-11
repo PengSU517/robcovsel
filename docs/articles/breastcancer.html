@@ -44,7 +44,6 @@
     <a class="dropdown-item" href="../articles/boston.html">Boston Housing</a>
     <a class="dropdown-item" href="../articles/breastcancer.html">Breast Cancer</a>
     <a class="dropdown-item" href="../articles/demo.html">demo</a>
-    <a class="dropdown-item" href="../articles/simu.html">Simulation</a>
   </div>
 </li>
       </ul>
@@ -90,22 +89,22 @@
 <h2 id="data-description">Data description<a class="anchor" aria-label="anchor" href="#data-description"></a>
 </h2>
 <p>To illustrate a real data application for a high dimensional
-settings, we use the Breast Cancer dataset citep{van_t_veer_gene_2002}
-as an example. There are 24,481 genes of 117 breast tumor patients in
-this dataset. For the 78 breast cancer patients with disease-free
-survival time, {for each of the genes the} <span class="math inline">\(\log_{10}(Intensity)\)</span>, <span class="math inline">\(\log_{10}(Ratio)\)</span> and p-value is given. We
+settings, we use the Breast Cancer dataset (van’t Veer. et.al 2002) as
+an example. There are 24,481 genes of 117 breast tumor patients in this
+dataset. For the 78 breast cancer patients with disease-free survival
+time, {for each of the genes the} <span class="math inline">\(\log_{10}(Intensity)\)</span> is given. We
 construct a regression model to select some important genes whose <span class="math inline">\(\log_{10}(Intensity)\)</span> are significantly
 related to the disease-free patient survival. For the sake of this, we
 regard the disease-free survival time as the response and use the <span class="math inline">\(\log_{10}(Intensity)\)</span>’s as predictors.</p>
 <p>It is assumed that only a few genes are associated with disease-free
 survival time. For very high dimensional datasets, usually we screen
 some variables first and then run variable selection based on the
-predictors we screened, such as in citet{bai_variable_2021}. Thus we
-first compute the robust marginal correlations (using the pairwise
-estimator cite{gnanadesikan_robust_1972} with the <span class="math inline">\(Q_n\)</span> scale estimator
-citep{rousseeuw_alternatives_1993}) of gene expressions with
-disease-free survival time and then select the 200 genes that have the
-largest robust pairwise correlation coefficients as predictors.</p>
+predictors we screened. Thus we first compute the robust marginal
+correlations (using the pairwise estimator (Gnanadesikan and Kettenring,
+1972) with the <span class="math inline">\(Q_n\)</span> scale estimator
+(Rousseeuw and Croux, 1993) of gene expressions with disease-free
+survival time and then select the 100 genes that have the largest robust
+pairwise correlation coefficients as predictors.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">y</span> <span class="op">=</span> <span class="va">breastcancer_screened</span><span class="op">$</span><span class="va">dat.surtime</span>
 <span class="va">x</span> <span class="op">=</span> <span class="va">breastcancer_screened</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">+</span><span class="fl">2</span><span class="op">]</span>
@@ -182,7 +181,233 @@ correlations with the survival time.</p>
 
 <span class="va">rst_tbl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">rst</span>, nrow <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
+<span class="va">rst_tbl</span>
+<span class="co">#&gt;                V1             V2             V3             V4             V5</span>
+<span class="co">#&gt; 1        AL162078 Contig37028_RC Contig40406_RC    Contig62306 Contig64630_RC</span>
+<span class="co">#&gt; 2       NM_001616      NM_001830      NM_002824      NM_003125      NM_003860</span>
+<span class="co">#&gt; 3       NM_013437           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 4            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 5            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 6            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 7            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 8            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 9            &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 10           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 11           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 12           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 13       AL162078 Contig35537_RC Contig37028_RC Contig38966_RC Contig40406_RC</span>
+<span class="co">#&gt; 14 Contig48328_RC Contig57357_RC    Contig62306 Contig64630_RC         M94046</span>
+<span class="co">#&gt; 15      NM_001616      NM_001830      NM_002442      NM_002824      NM_003125</span>
+<span class="co">#&gt; 16      NM_004052      NM_004618      NM_005785      NM_013437      NM_014706</span>
+<span class="co">#&gt; 17           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 18           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 19           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 20           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 21           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 22           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 23           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 24           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;       AL162078</span>
+<span class="co">#&gt; 25 Contig48328_RC Contig54956_RC Contig55181_RC         M94046      NM_001616</span>
+<span class="co">#&gt; 26           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 27           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 28           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 29           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 30           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 31           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 32           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 33           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 34           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 35           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 36           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;       AL162078 Contig19451_RC</span>
+<span class="co">#&gt; 37 Contig48328_RC Contig54893_RC Contig54956_RC Contig55181_RC Contig57357_RC</span>
+<span class="co">#&gt; 38      NM_001616      NM_005785      NM_005881      NM_006301           &lt;NA&gt;</span>
+<span class="co">#&gt; 39           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 40           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 41           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 42           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 43           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 44           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 45           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 46           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 47           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 48           &lt;NA&gt;           &lt;NA&gt;       AB029009       AL162078 Contig36859_RC</span>
+<span class="co">#&gt; 49         M94046      NM_006301           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 50           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 51           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 52           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 53           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 54           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 55           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 56           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 57           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 58           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 59           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 60           &lt;NA&gt;       AL162078 Contig37063_RC Contig42740_RC Contig48328_RC</span>
+<span class="co">#&gt; 61 Contig55181_RC Contig57357_RC         M94046      NM_001673      NM_005881</span>
+<span class="co">#&gt; 62      NM_016390           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 63           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 64           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 65           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 66           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 67           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 68           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 69           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 70           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 71           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 72       AL162078 Contig14797_RC Contig31424_RC Contig37063_RC Contig40406_RC</span>
+<span class="co">#&gt; 73 Contig48328_RC Contig54956_RC         M94046      NM_001616      NM_001643</span>
+<span class="co">#&gt; 74      NM_001861      NM_003158      NM_003862      NM_004911      NM_013437</span>
+<span class="co">#&gt; 75      NM_020974           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 76           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 77           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 78           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 79           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 80           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 81           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 82           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 83           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="co">#&gt; 84       AB029009       AB040942       AB040971       AF070605       AF155652</span>
+<span class="co">#&gt; 85       AK001044       AL110193       AL137362       AL137527       AL162078</span>
+<span class="co">#&gt; 86 Contig14797_RC Contig19451_RC Contig29141_RC Contig30146_RC Contig31312_RC</span>
+<span class="co">#&gt; 87 Contig37028_RC Contig37063_RC Contig40406_RC Contig41521_RC Contig42740_RC</span>
+<span class="co">#&gt; 88 Contig48328_RC Contig48472_RC Contig50846_RC Contig52620_RC Contig54893_RC</span>
+<span class="co">#&gt; 89 Contig55181_RC    Contig56229 Contig57357_RC Contig57521_RC   Contig726_RC</span>
+<span class="co">#&gt; 90      NM_000915      NM_001616      NM_001643      NM_001720      NM_001826</span>
+<span class="co">#&gt; 91      NM_001861      NM_001905      NM_002442      NM_002824      NM_003125</span>
+<span class="co">#&gt; 92      NM_003860      NM_003862      NM_003992      NM_004824      NM_004911</span>
+<span class="co">#&gt; 93      NM_005881      NM_006301      NM_006305      NM_006752      NM_012261</span>
+<span class="co">#&gt; 94      NM_014347      NM_014519      NM_014675      NM_014894      NM_014908</span>
+<span class="co">#&gt; 95      NM_016083      NM_016390      NM_016434      NM_020974       AL162078</span>
+<span class="co">#&gt;                V6</span>
+<span class="co">#&gt; 1       NM_000907</span>
+<span class="co">#&gt; 2       NM_004618</span>
+<span class="co">#&gt; 3            &lt;NA&gt;</span>
+<span class="co">#&gt; 4            &lt;NA&gt;</span>
+<span class="co">#&gt; 5            &lt;NA&gt;</span>
+<span class="co">#&gt; 6            &lt;NA&gt;</span>
+<span class="co">#&gt; 7            &lt;NA&gt;</span>
+<span class="co">#&gt; 8            &lt;NA&gt;</span>
+<span class="co">#&gt; 9            &lt;NA&gt;</span>
+<span class="co">#&gt; 10           &lt;NA&gt;</span>
+<span class="co">#&gt; 11           &lt;NA&gt;</span>
+<span class="co">#&gt; 12       AJ236885</span>
+<span class="co">#&gt; 13 Contig45347_RC</span>
+<span class="co">#&gt; 14      NM_000907</span>
+<span class="co">#&gt; 15      NM_003860</span>
+<span class="co">#&gt; 16      NM_016083</span>
+<span class="co">#&gt; 17           &lt;NA&gt;</span>
+<span class="co">#&gt; 18           &lt;NA&gt;</span>
+<span class="co">#&gt; 19           &lt;NA&gt;</span>
+<span class="co">#&gt; 20           &lt;NA&gt;</span>
+<span class="co">#&gt; 21           &lt;NA&gt;</span>
+<span class="co">#&gt; 22           &lt;NA&gt;</span>
+<span class="co">#&gt; 23           &lt;NA&gt;</span>
+<span class="co">#&gt; 24 Contig22786_RC</span>
+<span class="co">#&gt; 25      NM_006301</span>
+<span class="co">#&gt; 26           &lt;NA&gt;</span>
+<span class="co">#&gt; 27           &lt;NA&gt;</span>
+<span class="co">#&gt; 28           &lt;NA&gt;</span>
+<span class="co">#&gt; 29           &lt;NA&gt;</span>
+<span class="co">#&gt; 30           &lt;NA&gt;</span>
+<span class="co">#&gt; 31           &lt;NA&gt;</span>
+<span class="co">#&gt; 32           &lt;NA&gt;</span>
+<span class="co">#&gt; 33           &lt;NA&gt;</span>
+<span class="co">#&gt; 34           &lt;NA&gt;</span>
+<span class="co">#&gt; 35           &lt;NA&gt;</span>
+<span class="co">#&gt; 36 Contig45347_RC</span>
+<span class="co">#&gt; 37         M94046</span>
+<span class="co">#&gt; 38           &lt;NA&gt;</span>
+<span class="co">#&gt; 39           &lt;NA&gt;</span>
+<span class="co">#&gt; 40           &lt;NA&gt;</span>
+<span class="co">#&gt; 41           &lt;NA&gt;</span>
+<span class="co">#&gt; 42           &lt;NA&gt;</span>
+<span class="co">#&gt; 43           &lt;NA&gt;</span>
+<span class="co">#&gt; 44           &lt;NA&gt;</span>
+<span class="co">#&gt; 45           &lt;NA&gt;</span>
+<span class="co">#&gt; 46           &lt;NA&gt;</span>
+<span class="co">#&gt; 47           &lt;NA&gt;</span>
+<span class="co">#&gt; 48 Contig48328_RC</span>
+<span class="co">#&gt; 49           &lt;NA&gt;</span>
+<span class="co">#&gt; 50           &lt;NA&gt;</span>
+<span class="co">#&gt; 51           &lt;NA&gt;</span>
+<span class="co">#&gt; 52           &lt;NA&gt;</span>
+<span class="co">#&gt; 53           &lt;NA&gt;</span>
+<span class="co">#&gt; 54           &lt;NA&gt;</span>
+<span class="co">#&gt; 55           &lt;NA&gt;</span>
+<span class="co">#&gt; 56           &lt;NA&gt;</span>
+<span class="co">#&gt; 57           &lt;NA&gt;</span>
+<span class="co">#&gt; 58           &lt;NA&gt;</span>
+<span class="co">#&gt; 59           &lt;NA&gt;</span>
+<span class="co">#&gt; 60 Contig54956_RC</span>
+<span class="co">#&gt; 61      NM_006301</span>
+<span class="co">#&gt; 62           &lt;NA&gt;</span>
+<span class="co">#&gt; 63           &lt;NA&gt;</span>
+<span class="co">#&gt; 64           &lt;NA&gt;</span>
+<span class="co">#&gt; 65           &lt;NA&gt;</span>
+<span class="co">#&gt; 66           &lt;NA&gt;</span>
+<span class="co">#&gt; 67           &lt;NA&gt;</span>
+<span class="co">#&gt; 68           &lt;NA&gt;</span>
+<span class="co">#&gt; 69           &lt;NA&gt;</span>
+<span class="co">#&gt; 70           &lt;NA&gt;</span>
+<span class="co">#&gt; 71           &lt;NA&gt;</span>
+<span class="co">#&gt; 72 Contig40772_RC</span>
+<span class="co">#&gt; 73      NM_001673</span>
+<span class="co">#&gt; 74      NM_014908</span>
+<span class="co">#&gt; 75           &lt;NA&gt;</span>
+<span class="co">#&gt; 76           &lt;NA&gt;</span>
+<span class="co">#&gt; 77           &lt;NA&gt;</span>
+<span class="co">#&gt; 78           &lt;NA&gt;</span>
+<span class="co">#&gt; 79           &lt;NA&gt;</span>
+<span class="co">#&gt; 80           &lt;NA&gt;</span>
+<span class="co">#&gt; 81           &lt;NA&gt;</span>
+<span class="co">#&gt; 82           &lt;NA&gt;</span>
+<span class="co">#&gt; 83       AB002369</span>
+<span class="co">#&gt; 84       AJ236885</span>
+<span class="co">#&gt; 85     Contig1408</span>
+<span class="co">#&gt; 86 Contig31424_RC</span>
+<span class="co">#&gt; 87 Contig47222_RC</span>
+<span class="co">#&gt; 88 Contig54956_RC</span>
+<span class="co">#&gt; 89         M94046</span>
+<span class="co">#&gt; 90      NM_001830</span>
+<span class="co">#&gt; 91      NM_003245</span>
+<span class="co">#&gt; 92      NM_005785</span>
+<span class="co">#&gt; 93      NM_013437</span>
+<span class="co">#&gt; 94      NM_015270</span>
+<span class="co">#&gt; 95 Contig37028_RC</span>
+
 <span class="co"># write_csv(rst_tbl,"breastcancer_result.csv")</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>[1] Bai, Y., Tian, M., Tang, M.-L., and Lee, W.-Y. (2021). Variable
+selection for ultra-high di- mensional quantile regression with missing
+data and measurement error. Statistical Methods in Medical Research,
+30(1):129–150.</p>
+<p>[2] Bottmer, L., Croux, C., and Wilms, I. (2021). Sparse regression
+for large data sets with outliers. European Journal of Operational
+Research, In Press.</p>
+<p>[3] Boudt, K., Cornelissen, J., and Croux, C. (2012). The Gaussian
+rank correlation estimator: robustness properties. Statistics and
+Computing, 22(2):471–483.</p>
+<p>[4] Gnanadesikan, R. and Kettenring, J. R. (1972). Robust estimates,
+residuals, and outlier detection with multiresponse data. Biometrics,
+28:81–124.</p>
+<p>[5] Huang, C., Farewell, D., and Pan, J. (2017). A calibration method
+for non-positive definite covariance matrix in multivariate data
+analysis. Journal of Multivariate Analysis, 157:45–52.</p>
+<p>[6] Ollerer, V., Alfons, A., and Croux, C. (2016). The shooting
+S-estimator for robust regres- sion. Computational Statistics,
+31(3):829–844.</p>
+<p>[7] Ollerer, V., and Croux, C. (2015). Robust high-dimensional
+precision matrix estimation. In Modern nonparametric, robust and
+multivariate methods, (pp. 325-350). Springer, Cham.</p>
+<p>[8] van ’t Veer, L. J., Dai, H., van de Vijver, M. J., He, Y. D.,
+Hart, A. A. M., Mao, M., Peterse, H. L., van der Kooy, K., Marton, M.
+J., Witteveen, A. T., Schreiber, G. J., Kerkhoven, R. M., Roberts, C.,
+Linsley, P. S., Bernards, R., and Friend, S. H. (2002). Gene expression
+profiling predicts clinical outcome of breast cancer. Nature,
+415(6871):530–536.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

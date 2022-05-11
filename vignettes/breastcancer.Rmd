@@ -33,9 +33,9 @@ library(corrplot)
 
 # Data description
 
-To illustrate a real data application for a high dimensional settings, we use the Breast Cancer dataset citep{van_t_veer_gene_2002} as an example. There are 24,481 genes of 117 breast tumor patients in this dataset. For the 78 breast cancer patients with disease-free survival time, {for each of the genes the} $\log_{10}(Intensity)$, $\log_{10}(Ratio)$ and p-value is given. We construct a regression model to select some important genes whose $\log_{10}(Intensity)$ are significantly related to the disease-free patient survival. For the sake of this, we regard the disease-free survival time as the response and use the  $\log_{10}(Intensity)$'s as predictors.
+To illustrate a real data application for a high dimensional settings, we use the Breast Cancer dataset (van't Veer. et.al 2002) as an example. There are 24,481 genes of 117 breast tumor patients in this dataset. For the 78 breast cancer patients with disease-free survival time, {for each of the genes the} $\log_{10}(Intensity)$ is given. We construct a regression model to select some important genes whose $\log_{10}(Intensity)$ are significantly related to the disease-free patient survival. For the sake of this, we regard the disease-free survival time as the response and use the  $\log_{10}(Intensity)$'s as predictors.
 
-It is assumed that only a few genes are associated with disease-free survival time. For very high dimensional datasets, usually we screen some variables first and then run variable selection based on the predictors we screened, such as in citet{bai_variable_2021}. Thus we first compute the robust marginal correlations (using the pairwise estimator cite{gnanadesikan_robust_1972} with the $Q_n$ scale estimator citep{rousseeuw_alternatives_1993}) of gene expressions with disease-free survival time and then select the 200 genes that have the largest robust pairwise correlation coefficients as predictors.
+It is assumed that only a few genes are associated with disease-free survival time. For very high dimensional datasets, usually we screen some variables first and then run variable selection based on the predictors we screened. Thus we first compute the robust marginal correlations (using the pairwise estimator (Gnanadesikan and Kettenring, 1972) with the $Q_n$ scale estimator (Rousseeuw and Croux, 1993) of gene expressions with disease-free survival time and then select the 100 genes that have the largest robust pairwise correlation coefficients as predictors.
 
 ```{r}
 y = breastcancer_screened$dat.surtime
@@ -99,11 +99,41 @@ colnames(rst) = c("ALRP", "LRP", "ALGR", "LGR", "ALasso","Lasso", "sLTS", "sShoo
 
 rst_tbl = as.data.frame(t(matrix(rst, nrow = 6)))
 
+rst_tbl
+
 # write_csv(rst_tbl,"breastcancer_result.csv")
 ```
 
 
+# References
 
+[1] Bai, Y., Tian, M., Tang, M.-L., and Lee, W.-Y. (2021). Variable selection for ultra-high di-
+mensional quantile regression with missing data and measurement error. Statistical Methods
+in Medical Research, 30(1):129–150.
+
+[2] Bottmer, L., Croux, C., and Wilms, I. (2021). Sparse regression for large data
+sets with outliers. European Journal of Operational Research, In Press.
+
+[3] Boudt, K., Cornelissen, J., and Croux, C. (2012). The Gaussian rank correlation estimator:
+robustness properties. Statistics and Computing, 22(2):471–483.
+
+
+[4] Gnanadesikan, R. and Kettenring, J. R. (1972). Robust estimates, residuals, and outlier
+detection with multiresponse data. Biometrics, 28:81–124.
+
+[5] Huang, C., Farewell, D., and Pan, J. (2017). A calibration method for non-positive definite
+covariance matrix in multivariate data analysis. Journal of Multivariate Analysis, 157:45–52.
+
+[6] Ollerer, V., Alfons, A., and Croux, C. (2016). The shooting S-estimator for robust regres-
+sion. Computational Statistics, 31(3):829–844.
+
+[7] Ollerer, V., and Croux, C. (2015). Robust high-dimensional precision matrix estimation.
+In Modern nonparametric, robust and multivariate methods, (pp. 325-350). Springer, Cham.
+
+[8] van ’t Veer, L. J., Dai, H., van de Vijver, M. J., He, Y. D., Hart, A. A. M., Mao, M., Peterse,
+H. L., van der Kooy, K., Marton, M. J., Witteveen, A. T., Schreiber, G. J., Kerkhoven, R. M.,
+Roberts, C., Linsley, P. S., Bernards, R., and Friend, S. H. (2002). Gene expression profiling
+predicts clinical outcome of breast cancer. Nature, 415(6871):530–536.
 
 
 

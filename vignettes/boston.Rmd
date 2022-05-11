@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = T
 )
 ```
 
@@ -24,11 +24,11 @@ A sparse regression model is fitted for,
 $$
 	\log(medv) =  \ \beta_0 + \beta_1 \log(lstat) + \beta_2 rm + \beta_3 \log(dis) + \beta_4 tax \\  + \beta_5 ptratio  + \beta_6 nox+ \beta_7 age + \beta_8 black + \beta_9 \log(crim) + \varepsilon,\\
 $$
-and we compare the performance of five methods: Lasso citep{tibshirani_regression_1996}, sLTS citep{alfons_sparse_2013}, sShootingS citep{bottmer_sparse_2021} {as well as the new proposed methods ALRP and ALGR}.
+and we compare the performance of five methods: Lasso (Tibshirani, 1996), ALasso (Zou,2006), sLTS (Alfons et al., 2013), sShootingS (Bottmer et al., 2021) as well as the new proposed methods ALRPm LRP, ALGR and LGR.
 
-To measure the performance of variable selection when adding some known redundant variables, we generate $10$ {additional} random variables as redundant predictors using the same setting as in the previous simulation section. Therefore, we now have 19 predictors to choose from. 
+To measure the performance of variable selection when adding some known redundant variables, we generate $10$ additional random variables as redundant predictors using the same setting as in the previous simulation section. Therefore, we now have 19 predictors to choose from. 
 
-To test the performance under cellwise contamination, we standardize {the} 19 predictors with robust estimators of location (here we use the median) and scale (here we use $Q_n$). Then, for each predictor, $10\%$ {of the} cells are replaced by cellwise outliers which are randomly generated from $0.5 N(10, 1)+ 0.5N(-10, 1)$. As a comparison, we will also run simulations without any contamination {to investigate how stable the various methods are when known outliers are present in the data}. We repeat this process of adding ten redundant variables followed by generating 10\% of outliers in the 19 explanatory variables 1,000 times, and then compute the selection rates of each variable
+To test the performance under cellwise contamination, we standardize the 19 predictors with robust estimators of location (here we use the median) and scale (here we use $Q_n$). Then, for each predictor, $10\%$ of the cells are replaced by cellwise outliers which are randomly generated from $0.5 N(10, 1)+ 0.5N(-10, 1)$. As a comparison, we will also run simulations without any contamination {to investigate how stable the various methods are when known outliers are present in the data}. We repeat this process of adding ten redundant variables followed by generating 10\% of outliers in the 19 explanatory variables 1,000 times, and then compute the selection rates of each variable
 
 # Analysis
 
@@ -49,7 +49,6 @@ predictors = Boston[, c("loglstat", "rm", "logdis", "tax", "ptratio","nox", "age
 corrs = cor(predictors)
 rownames(corrs) = colnames(corrs) = c("log(lstat)", "rm", "log(dis)", "tax", "ptratio","nox", "age", "black", "log(crim)")
 corrsplot = corrplot(corrs, method = "shade", tl.col ="black",shade.col = NA, tl.srt = 45, order = "FPC")
-corrsplot
 
 ```
 
@@ -69,13 +68,22 @@ corrsplot
   
 }
 
-tbl
 tbl[,c("method","e",  rownames(corrsplot$corr), "redundant")]
 
 #write_csv(tbl[,c("method","e",  rownames(corrsplot$corr), "redundant")], "Boston_table.csv")
 ```
 
 
+# References
 
+[1] Alfons, A., Croux, C., and Gelper, S. (2013). Sparse least trimmed squares regression for
+analyzing high-dimensional large data sets. The Annals of Applied Statistics, 7(1):226–248
 
+[2] Bottmer, L., Croux, C., and Wilms, I. (2021). Sparse regression for large data
+sets with outliers. European Journal of Operational Research, In Press.
 
+[3] Tibshirani, R. (1996). Regression shrinkage and selection via the Lasso. Journal of the
+Royal Statistical Society: Series B (Methodological), 58(1):267–288
+
+[4] Zou, H. (2006). The Adaptive Lasso and Its Oracle Properties. Journal of the American
+Statistical Association, 101(476):1418–1429.
