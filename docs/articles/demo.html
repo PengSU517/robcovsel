@@ -108,26 +108,26 @@
 <code class="sourceCode R">
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"pair"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>  
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.122   0.004   0.136</span>
+<span class="co">#&gt;   0.092   0.012   0.112</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit2</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   0.007   0.000   0.007</span>
+<span class="co">#&gt;   0.008   0.000   0.008</span>
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit3</span> <span class="op">=</span> <span class="fu">sparseshooting</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt; Warning: replacing previous import 'lifecycle::last_warnings' by</span>
 <span class="co">#&gt; 'rlang::last_warnings' when loading 'tibble'</span>
 <span class="co">#&gt; Warning: replacing previous import 'lifecycle::last_warnings' by</span>
 <span class="co">#&gt; 'rlang::last_warnings' when loading 'pillar'</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   1.884   0.060   2.003</span>
+<span class="co">#&gt;   2.509   0.116   2.676</span>
 
 <span class="va">fit1</span><span class="op">$</span><span class="va">pda.method</span>
 <span class="co">#&gt; [1] "nearpd"</span>
 <span class="va">fit1</span><span class="op">$</span><span class="va">adaptive</span>
 <span class="co">#&gt; [1] TRUE</span>
 <span class="va">fit1</span><span class="op">$</span><span class="va">lmin</span>
-<span class="co">#&gt; [1] 0.303827</span>
+<span class="co">#&gt; [1] 0.3397303</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">$</span><span class="va">betahat_opt</span><span class="op">)</span>
-<span class="co">#&gt; [1] 0.6038418 1.0923205 1.2228418 1.1176299 0.6153366 0.0000000</span></code></pre></div>
+<span class="co">#&gt; [1] 0.8339141 1.0757949 0.9613003 0.9942261 0.8464715 0.0000000</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">500131</span><span class="op">)</span>
 <span class="va">dataset1</span> <span class="op">=</span> <span class="fu"><a href="../reference/genevar.html">genevar</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fl">200</span>, e <span class="op">=</span> <span class="fl">0.1</span>, gamma <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>

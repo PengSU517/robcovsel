@@ -73,7 +73,7 @@ summary1$adaptive = factor(summary1$adaptive, levels = c("TRUE", "FALSE"))
 ```
 
 
-```{r  fig.width=10, fig.height=10, echo=FALSE}
+```{r  fig.width=10, fig.height=10, echo=T}
 p1 = ggplot(data = summary1, aes(x = r,y = F1))+
   geom_line(aes(linetype = Method, color = Method))+ 
   geom_point(aes(shape = Method, color = Method)) + 
@@ -102,7 +102,7 @@ p1
 ```
 
 
-```{r  fig.width=10, fig.height=10, echo=FALSE}
+```{r  fig.width=10, fig.height=10, echo=T}
 p2 = ggplot(data = summary1, aes(x = r,y = TPR))+
   geom_line(aes(linetype = Method, color = Method))+ 
   geom_point(aes(shape = Method, color = Method)) + 
@@ -123,7 +123,7 @@ p2
 #ggsave("plots_200_tpr.eps", plot = p2, width = 10,height = 9)
 ```
 
-```{r  fig.width=10, fig.height=10, echo=FALSE}
+```{r  fig.width=10, fig.height=10, echo=T}
 p3 = ggplot(data = summary1, aes(x = r,y = FPR))+
   geom_line(aes(linetype = Method, color = Method))+ 
   geom_point(aes(shape = Method, color = Method)) + 
