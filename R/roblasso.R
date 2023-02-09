@@ -24,8 +24,10 @@
 #' fit$betahat_opt
 #'
 
-covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method = NULL,
-                    lmin = NULL, std = T, adaptive = T, cormatrix = NULL, scale = NULL){
+
+
+covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.method = "median", pda.method = NULL,
+                    lmin = NULL, std = TRUE, adaptive = TRUE){
 
   x = as.matrix(x)
   data = cbind(y,x)
@@ -39,14 +41,13 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
     }
   }
 
-  if(is.null(cormatrix)){
-    rst = covf(data, cor.method, scale.method, pda.method, lmin)
+  {
+    rst = covf(data, cor.method, scale.method, center.method, pda.method, lmin)
     cormatrix = rst$cormatrix
     scale = rst$scale
+    center = rst$center
     covmatrix = rst$covmatrix
     lmin = rst$lmin
-  }else{
-    covmatrix = (diag(scale))%*%cormatrix%*%(diag(scale))
   }
 
 
@@ -80,27 +81,29 @@ covlasso = function(x, y, cor.method = "pair", scale.method = "qn", pda.method =
   sigmapf = function(beta){(t(response-predictor%*%beta)%*%(response-predictor%*%beta))*ifelse(std,scale[1]^2,1)}
   sigma2hat = apply(betahat, 2, sigmapf)
 
-  #beta0f = function(beta){((mean(y) - colMeans(x)%*%beta))*ifelse(std,scale[1]^2,1)}
-  #beta0hat = apply(betahat, 2, beta0f)
-
   if(std){betahat = (scale[1]*(betahat)/scale[-1])}
 
   penal = apply(betahat, 2, function(betahat){sum(as.logical(betahat))})
   bic = n*log(sigma2hat) + (penal) * log(n)
 
-  betahat = t(betahat)
+  #betahat = t(betahat)
+  beta0f = function(betahatvec){((center[1] - sum(center[-1]*betahatvec)))}
+  #*ifelse(std,scale[1]^2,1)
+  beta0hat = apply(betahat, 2, beta0f)
 
   label = which.min(bic)
   bic_opt = bic[label]
-  lambda_opt = lambda[label-1]
-  #beta0hat_opt = beta0hat[label]
-  betahat_opt = betahat[label,]
+  lambda_opt = lambda[label]####why need to -1
+  beta0hat_opt = beta0hat[label]
+  betahat_opt = c(const = beta0hat_opt, beta = as.numeric(betahat[,label]))
   sigma2hat_opt = sigma2hat[label]
 
-  list(lambda = lambda, betahat = betahat, sigma2hat = sigma2hat, penal = penal, bic = bic,
-       covmatrix = covmatrix, cormatrix = cormatrix, scale = scale,
+
+
+  list(lambda = lambda, betahat = betahat, beta0hat = beta0hat, sigma2hat = sigma2hat, penal = penal, bic = bic,
+       covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center,
        cor.method = cor.method, scale.method = scale.method, pda.method = pda.method,
        lmin = lmin, std = std, adaptive = adaptive,
-       lambda_opt = lambda_opt, #beta0hat_opt = beta0hat_opt,
+       lambda_opt = lambda_opt,
        betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
 }

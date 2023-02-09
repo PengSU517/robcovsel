@@ -20,7 +20,7 @@
 #' x = matrix(rnorm(100), ncol = 10)
 #' covf(x)
 #'
-covf = function(x, cor.method, scale.method, pda.method, lmin = NULL){
+covf = function(x, cor.method, scale.method, center.method, pda.method, lmin = NULL){
 
   n = dim(x)[1]
   p = dim(x)[2]
@@ -29,7 +29,11 @@ covf = function(x, cor.method, scale.method, pda.method, lmin = NULL){
   if(scale.method == "mad"){sf = function(x) mad(x)}
   if(scale.method == "qn"){sf = function(x) robustbase::Qn(x)}
 
+  if(center.method == "mean"){mf = function(x) mean(x)}
+  if(center.method == "median"){mf = function(x) median(x)}
+
   scale = apply(x,2,sf)
+  center = apply(x,2,mf)
 
 
   if(cor.method=="pearson"){
@@ -61,7 +65,7 @@ covf = function(x, cor.method, scale.method, pda.method, lmin = NULL){
     cormatrix = nearpdrst$cormatrix.pd
     lmin = nearpdrst$lmin}
   covmatrix = (diag(scale))%*%cormatrix%*%(diag(scale))
-  return(list(covmatrix = covmatrix, cormatrix = cormatrix, scale = scale,lmin = lmin))
+  return(list(covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center, lmin = lmin))
 }
 
 
@@ -135,14 +139,27 @@ lminsel = function(cormatrix){
 #' x = rnorm(100)
 #' y = rnorm(100)
 #' paircorxyf(x,y)
-paircorxyf = function(x,y){
-  sf = function(x) robustbase::Qn(x)
-  scalex = sf(x)
-  scaley = sf(y)
-  u = x/scalex + y/scaley
-  v = x/scalex - y/scaley
-  cor = ((sf(u))^2 - (sf(v))^2)/((sf(u))^2 + (sf(v))^2)
-  return(cor)
+paircorxyf = function(x,y, method = "pair"){
+  if(method=="pair"){
+    sf = function(x) robustbase::Qn(x)
+    gkpairf = function(xvec){
+      scalex = sf(xvec)
+      scaley = sf(y)
+      u = xvec/scalex + y/scaley
+      v = xvec/scalex - y/scaley
+      cor = ((sf(u))^2 - (sf(v))^2)/((sf(u))^2 + (sf(v))^2)
+    }
+    corvec = apply(x,2,gkpairf)
+
+  }
+  if(method == "gaussrank"){
+    n = length(y)
+    ytilde = qnorm(rank(y)/(n + 1))
+    xtilde = apply(x,2,function(xvec){qnorm(rank(xvec)/(n + 1))})
+    corvec = cor(xtilde,ytilde)
+  }
+
+  return(corvec)
 }
 
 #' generating predictors and response randomly using default settings
@@ -162,7 +179,7 @@ paircorxyf = function(x,y){
 #'
 #' @examples
 #'
-genevar = function(n = 100, p = 20, e = 0.05, r = 0.5,
+genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, intercept = 0,
                    beta = c(1,2,1,2,1,rep(0,p-5)), gamma = 10, errorsigma = 1){
 
   {
@@ -173,9 +190,17 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5,
   }
 
   {
+    intercept = intercept
+
     xr = mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
+    xrnew = mvtnorm::rmvnorm(n = n, mean = mu, sigma = sigma)
+
     error = rnorm(n,0,errorsigma)
-    y = xr%*%beta + error
+    errornew = rnorm(n,0,errorsigma)
+
+    y = intercept + xr%*%beta + error
+    ynew = intercept + xrnew%*%beta + errornew
+
     bi = apply(matrix(0, nrow = n, ncol = p), 2,
                function(xvec) {xvec[sample(x = 1:n, size = e*n)] = 1; return(xvec)})
     outl = rnorm(n = n*p, mean = gamma, sd = 1)
@@ -183,8 +208,8 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5,
     outlier = matrix(outl*rsign, nrow = n, ncol=p)
     x = xr*(1-bi)+outlier*bi
   }
-  return(list(x = x, y = y, beta = beta))
 
+  return(list(xr = xr, x = x, y = y, error = error, beta = beta, xrnew = xrnew, ynew = ynew, errornew = errornew))
 
 }
 
