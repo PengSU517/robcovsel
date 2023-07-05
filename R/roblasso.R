@@ -26,8 +26,7 @@
 
 
 
-covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.method = "median", pda.method = NULL,
-                    lmin = NULL, std = TRUE, adaptive = TRUE){
+covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.method = "median", adaptive = TRUE){
 
   x = as.matrix(x)
   data = cbind(y,x)
@@ -35,35 +34,29 @@ covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.
   n = dim(x)[1]
   p = dim(x)[2]
 
-  if(is.null(pda.method)){
-    if((cor.method == "pair")|(p>(0.5*n))){pda.method = "nearpd"}else{
-      pda.method = F
-    }
-  }
-
   {
-    rst = covf(data, cor.method, scale.method, center.method, pda.method, lmin)
+    rst = covf(data, cor.method, scale.method, center.method)
     cormatrix = rst$cormatrix
     scale = rst$scale
     center = rst$center
     covmatrix = rst$covmatrix
-    lmin = rst$lmin
+
   }
 
-
-
-  if(std){Sigma = cormatrix
-  }else{Sigma = covmatrix}
-
+  Sigma = cormatrix
   eigenrst = eigen(Sigma)
-  Sigmasqrt = (eigenrst$vectors)%*%diag(sqrt(eigenrst$values))%*%t(eigenrst$vectors)
+  sqrteigen = pmax(eigenrst$values,0)
+  Sigmasqrt = (eigenrst$vectors)%*%diag(sqrteigen)%*%t(eigenrst$vectors)
 
   response = as.matrix(Sigmasqrt[,1])
   predictor = Sigmasqrt[,-1]
 
-
   if(adaptive){
-    betastar = MASS::ginv(t(predictor)%*%predictor)%*%t(predictor)%*%response
+    if(n>2*p){
+      betastar = solve(Sigma[-1, -1])%*%Sigma[-1,1]
+    }else{
+      betastar = solve(Sigma[-1, -1] + diag(rep(0.2, p)))%*%Sigma[-1,1]
+    }
     weight = as.numeric(abs(1/betastar))
     Predictor = predictor%*%MASS::ginv(diag(weight))
   }else{
@@ -71,24 +64,26 @@ covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.
   }
 
   fit = lars::lars(Predictor,response, type = "lasso",  intercept = F,normalize = F)
-  lambda = fit$lambda
   betatilde = t(as.matrix(fit$beta))
+  lambda = fit$lambda
 
   if(adaptive){
     betahat = betatilde/weight
   }else{betahat = betatilde}
 
-  sigmapf = function(beta){(t(response-predictor%*%beta)%*%(response-predictor%*%beta))*ifelse(std,scale[1]^2,1)}
+  #sigmapf = function(beta){(t(response-predictor%*%beta)%*%(response-predictor%*%beta))*(scale[1]^2)}
+  betahat = (scale[1]*(betahat)/scale[-1])
+
+  sigmapf = function(beta){covmatrix[1,1] - sum(covmatrix[1,-1]*beta)}
   sigma2hat = apply(betahat, 2, sigmapf)
 
-  if(std){betahat = (scale[1]*(betahat)/scale[-1])}
+  # betaridge = scale[1]*(solve(Sigma[-1, -1] + diag(rep(0.2, p)))%*%Sigma[-1,1])/scale[-1]
+  sigma2_0 = covmatrix[1,1]
 
   penal = apply(betahat, 2, function(betahat){sum(as.logical(betahat))})
-  bic = n*log(sigma2hat) + (penal) * log(n)
+  bic = (sigma2hat/sigma2_0) + (penal) * log(n)/n
 
-  #betahat = t(betahat)
   beta0f = function(betahatvec){((center[1] - sum(center[-1]*betahatvec)))}
-  #*ifelse(std,scale[1]^2,1)
   beta0hat = apply(betahat, 2, beta0f)
 
   label = which.min(bic)
@@ -102,8 +97,66 @@ covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.
 
   list(lambda = lambda, betahat = betahat, beta0hat = beta0hat, sigma2hat = sigma2hat, penal = penal, bic = bic,
        covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center,
-       cor.method = cor.method, scale.method = scale.method, pda.method = pda.method,
-       lmin = lmin, std = std, adaptive = adaptive,
-       lambda_opt = lambda_opt,
-       betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
+       cor.method = cor.method, scale.method = scale.method, adaptive = adaptive,
+       lambda_opt = lambda_opt, beta0hat_opt = beta0hat_opt, betahat_opt = betahat_opt, sigma2hat_opt = sigma2hat_opt, bic_opt = bic_opt)
 }
+
+
+#' Title
+#'
+#' @param x
+#' @param y
+#' @param cor.method
+#' @param scale.method
+#' @param center.method
+#' @param adaptive
+#'
+#' @return
+#' @export
+#'
+#' @examples
+copulalasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.method = "median", adaptive = TRUE){
+
+  x = as.matrix(x)
+  data = cbind(y,x)
+
+  n = dim(x)[1]
+  p = dim(x)[2]
+
+  {
+    rst = covf(data, cor.method, scale.method, center.method)
+    datatilde = rst$xtilde
+    cormatrix = rst$cormatrix
+    scale = rst$scale
+    center = rst$center
+    covmatrix = rst$covmatrix
+
+  }
+
+  response = datatilde[,1]
+  predictor = datatilde[,-1]
+
+  if(adaptive){
+    fit0 = glmnet::cv.glmnet(predictor, response, standardize = FALSE, intercept = FALSE, nlambda = 50, alpha = 0)
+    betastar = as.numeric(coef(fit0, s = "lambda.1se"))[-1]
+    # betastar = solve(cormatrix[-1, -1] + diag(rep(0.2, p)))%*%cormatrix[-1,1]
+    weight = as.numeric(abs(1/betastar))
+    Predictor = predictor%*%MASS::ginv(diag(weight))
+  }else{
+    Predictor = predictor
+  }
+
+  fit = glmnet::cv.glmnet(Predictor, response, standardize = FALSE, intercept = FALSE, nlambda = 50)
+  betatilde = as.numeric(coef(fit, s = "lambda.1se"))[-1]
+
+  if(adaptive){
+    betahat = betatilde/weight
+  }else{betahat = betatilde}
+
+  betahat = (scale[1]*(betahat)/scale[-1])
+  beta0hat = center[1] - sum(center[-1]*betahat)
+  betahat = c(beta0hat, betahat)
+
+  list(betahat = betahat, covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center)
+}
+

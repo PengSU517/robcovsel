@@ -4,7 +4,7 @@
 \alias{covf}
 \title{Correlation estimators}
 \usage{
-covf(x, cor.method, scale.method, pda.method, lmin = NULL)
+covf(x, cor.method, scale.method, center.method)
 }
 \arguments{
 \item{x}{input matrix}
@@ -31,6 +31,6 @@ Correlation estimators
 }
 \examples{
 x = matrix(rnorm(100), ncol = 10)
-paircorf(x)
+covf(x)
 
 }

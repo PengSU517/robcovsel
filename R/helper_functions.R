@@ -20,7 +20,7 @@
 #' x = matrix(rnorm(100), ncol = 10)
 #' covf(x)
 #'
-covf = function(x, cor.method, scale.method, center.method, pda.method, lmin = NULL){
+covf = function(x, cor.method, scale.method, center.method){
 
   n = dim(x)[1]
   p = dim(x)[2]
@@ -37,6 +37,7 @@ covf = function(x, cor.method, scale.method, center.method, pda.method, lmin = N
 
 
   if(cor.method=="pearson"){
+    xtilde = robustHD::standardize(x)
     cormatrix = cor(x)
   }
 
@@ -45,27 +46,23 @@ covf = function(x, cor.method, scale.method, center.method, pda.method, lmin = N
     cormatrix = cor(xtilde)
   }
 
-  if(cor.method== "pair"){
+  # if(cor.method== "pair"){
+  #
+  #   stdx = x%*%diag(1/scale)
+  #   I = diag(1,p)
+  #   R = t(as.matrix(rep(1,p)))
+  #
+  #   U = stdx%*%(kronecker(I,R) + kronecker(R,I))
+  #   V = stdx%*%(kronecker(I,R) - kronecker(R,I))
+  #
+  #   scaleu = apply(U, 2, sf)
+  #   scalev = apply(V, 2, sf)
+  #
+  #   cormatrix = matrix((scaleu^2-scalev^2)/(scaleu^2+scalev^2),nrow = p)
+  # }
 
-    stdx = x%*%diag(1/scale)
-    I = diag(1,p)
-    R = t(as.matrix(rep(1,p)))
-
-    U = stdx%*%(kronecker(I,R) + kronecker(R,I))
-    V = stdx%*%(kronecker(I,R) - kronecker(R,I))
-
-    scaleu = apply(U, 2, sf)
-    scalev = apply(V, 2, sf)
-
-    cormatrix = matrix((scaleu^2-scalev^2)/(scaleu^2+scalev^2),nrow = p)
-  }
-
-  if(pda.method!=F){
-    nearpdrst = nearpdf(cormatrix, pda.method, lmin)
-    cormatrix = nearpdrst$cormatrix.pd
-    lmin = nearpdrst$lmin}
   covmatrix = (diag(scale))%*%cormatrix%*%(diag(scale))
-  return(list(covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center, lmin = lmin))
+  return(list(covmatrix = covmatrix, cormatrix = cormatrix, scale = scale, center = center, xtilde = xtilde))
 }
 
 
@@ -85,7 +82,7 @@ covf = function(x, cor.method, scale.method, center.method, pda.method, lmin = N
 #' x = matrix(rnorm(100), ncol = 10)
 #' nearpdf(cor(x), pda.method = "nearpd", lmin = 0.1)
 
-nearpdf = function(cormatrix, pda.method, lmin){
+nearpdf = function(cormatrix, pda.method = "shrink", lmin = 0.1){
 
   if(is.null(lmin)){lmin = lminsel(cormatrix)}
 
@@ -139,7 +136,7 @@ lminsel = function(cormatrix){
 #' x = rnorm(100)
 #' y = rnorm(100)
 #' paircorxyf(x,y)
-paircorxyf = function(x,y, method = "pair"){
+paircorxyf = function(x,y, method = "gaussrank"){
   if(method=="pair"){
     sf = function(x) robustbase::Qn(x)
     gkpairf = function(xvec){
@@ -209,7 +206,7 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, intercept = 0,
     x = xr*(1-bi)+outlier*bi
   }
 
-  return(list(xr = xr, x = x, y = y, error = error, beta = beta, xrnew = xrnew, ynew = ynew, errornew = errornew))
+  return(list(xr = xr, x = x, y = y, error = error, beta = beta, xrnew = xrnew, ynew = ynew, errornew = errornew, sigma = sigma))
 
 }
 
@@ -230,7 +227,7 @@ genevar = function(n = 100, p = 20, e = 0.05, r = 0.5, intercept = 0,
 #' @return
 #' @export
 #'
-grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
+grid_arrange_shared_legend <- function(..., nrow = length(list(...)), ncol = 1, position = c("bottom", "right")) {
 
   plots <- list(...)
   position <- match.arg(position)

@@ -4,7 +4,7 @@
 \alias{paircorxyf}
 \title{Pairwise correlation between x and y}
 \usage{
-paircorxyf(x, y)
+paircorxyf(x, y, method = "gaussrank")
 }
 \arguments{
 \item{x}{input vector}

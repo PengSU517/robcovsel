@@ -9,8 +9,10 @@ genevar(
   p = 20,
   e = 0.05,
   r = 0.5,
+  intercept = 0,
   beta = c(1, 2, 1, 2, 1, rep(0, p - 5)),
-  gamma = 10
+  gamma = 10,
+  errorsigma = 1
 )
 }
 \arguments{
@@ -35,11 +37,4 @@ beta, the regression coefficients we use
 }
 \description{
 generating predictors and response randomly using default settings
-}
-\examples{
-
-dat = genevar()
-x = dat$x
-y = dat$y
-
 }

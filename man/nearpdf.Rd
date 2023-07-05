@@ -4,7 +4,7 @@
 \alias{nearpdf}
 \title{PD calibration}
 \usage{
-nearpdf(cormatrix, pda.method, lmin)
+nearpdf(cormatrix, pda.method = "shrink", lmin = 0.1)
 }
 \arguments{
 \item{cormatrix}{input cormatrix}

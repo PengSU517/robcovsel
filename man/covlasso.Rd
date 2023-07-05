@@ -7,14 +7,10 @@
 covlasso(
   x,
   y,
-  cor.method = "pair",
+  cor.method = "gaussrank",
   scale.method = "qn",
-  pda.method = NULL,
-  lmin = NULL,
-  std = T,
-  adaptive = T,
-  cormatrix = NULL,
-  scale = NULL
+  center.method = "median",
+  adaptive = TRUE
 )
 }
 \arguments{
@@ -26,14 +22,14 @@ covlasso(
 
 \item{scale.method}{could be "pearson", "pair" and "gaussrank"}
 
+\item{adaptive}{adaptive regularization penalties}
+
 \item{pda.method}{"nearpd" or FALSE}
 
 \item{lmin}{min threshold of eigenvalues}
 
 \item{std}{If TRUE the robust correlation matrix is used,
 if FALSE the robust covariance matrix is used.}
-
-\item{adaptive}{adaptive regularization penalties}
 
 \item{cormatrix}{you could also use a correlation matrix as input}
 
