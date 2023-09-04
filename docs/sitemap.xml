@@ -7,9 +7,6 @@
     <loc>/articles/boston.html</loc>
   </url>
   <url>
-    <loc>/articles/breastcancer.html</loc>
-  </url>
-  <url>
     <loc>/articles/demo.html</loc>
   </url>
   <url>
@@ -22,6 +19,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/copulalasso.html</loc>
+  </url>
+  <url>
     <loc>/reference/covf.html</loc>
   </url>
   <url>
@@ -29,6 +29,9 @@
   </url>
   <url>
     <loc>/reference/genevar.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grid_arrange_shared_legend.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>

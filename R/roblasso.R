@@ -2,8 +2,8 @@
 #'
 #' @param x input design matrix
 #' @param y input response vector
-#' @param cor.method "sd" or "qn"
-#' @param scale.method could be "pearson", "pair" and "gaussrank"
+#' @param cor.method could be "pearson", "pair" and "gaussrank"
+#' @param scale.method "sd" or "qn"
 #' @param pda.method "nearpd" or FALSE
 #' @param lmin min threshold of eigenvalues
 #' @param std If TRUE the robust correlation matrix is used,
