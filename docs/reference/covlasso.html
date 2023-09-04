@@ -70,23 +70,15 @@
 
 
 <dt>cor.method</dt>
-<dd><p>"sd" or "qn"</p></dd>
+<dd><p>could be "pearson" or "gaussrank"</p></dd>
 
 
 <dt>scale.method</dt>
-<dd><p>could be "pearson", "pair" and "gaussrank"</p></dd>
+<dd><p>"sd" or "qn"</p></dd>
 
 
 <dt>adaptive</dt>
 <dd><p>adaptive regularization penalties</p></dd>
-
-
-<dt>pda.method</dt>
-<dd><p>"nearpd" or FALSE</p></dd>
-
-
-<dt>lmin</dt>
-<dd><p>min threshold of eigenvalues</p></dd>
 
 
 <dt>std</dt>
@@ -122,12 +114,12 @@ if FALSE the robust covariance matrix is used.</p></dd>
 <span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">x</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">covlasso</span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span><span class="op">$</span><span class="va">betahat_opt</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   const.3     beta1     beta2     beta3     beta4     beta5     beta6     beta7 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -1.029346  0.000000  1.825666  1.289028  2.382943  0.000000  0.000000  0.000000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     beta8     beta9    beta10    beta11    beta12    beta13    beta14    beta15 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000000  0.000000  0.000000  0.000000  0.000000  0.000000  0.000000  0.000000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    beta16    beta17    beta18    beta19    beta20 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.000000  0.000000  0.000000  0.000000  0.000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    const.3      beta1      beta2      beta3      beta4      beta5      beta6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.6848624  0.0000000  2.4248406  0.5241094  2.2935756  0.0000000  0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      beta7      beta8      beta9     beta10     beta11     beta12     beta13 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     beta14     beta15     beta16     beta17     beta18     beta19     beta20 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000  0.0000000 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

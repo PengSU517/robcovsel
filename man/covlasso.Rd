@@ -18,15 +18,11 @@ covlasso(
 
 \item{y}{input response vector}
 
-\item{cor.method}{"sd" or "qn"}
+\item{cor.method}{could be "pearson" or "gaussrank"}
 
-\item{scale.method}{could be "pearson", "pair" and "gaussrank"}
+\item{scale.method}{"sd" or "qn"}
 
 \item{adaptive}{adaptive regularization penalties}
-
-\item{pda.method}{"nearpd" or FALSE}
-
-\item{lmin}{min threshold of eigenvalues}
 
 \item{std}{If TRUE the robust correlation matrix is used,
 if FALSE the robust covariance matrix is used.}

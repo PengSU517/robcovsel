@@ -91,30 +91,30 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="va">fit1</span> <span class="op">=</span> <span class="fu"><a href="../reference/covlasso.html">covlasso</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span>,cor.method <span class="op">=</span> <span class="st">"gaussrank"</span>,scale.method <span class="op">=</span> <span class="st">"qn"</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.048   0.008   0.056</span></span>
+<span><span class="co">#&gt;   0.053   0.000   0.054</span></span>
 <span><span class="va">fit1</span><span class="op">$</span><span class="va">betahat</span></span>
-<span><span class="co">#&gt;       0         1        2         3         4         5          6           7</span></span>
-<span><span class="co">#&gt;  [1,] 0 0.0000000 0.000000 0.0000000 0.4430492 0.7301795 0.73898501  0.74459145</span></span>
-<span><span class="co">#&gt;  [2,] 0 0.0000000 1.461551 1.7372914 1.5717192 1.3806289 1.37381055  1.37497608</span></span>
-<span><span class="co">#&gt;  [3,] 0 0.0000000 0.000000 0.5959273 0.9059614 0.9745130 0.97874877  0.98039986</span></span>
-<span><span class="co">#&gt;  [4,] 0 0.6580731 1.558227 1.6057384 1.5660448 1.4511138 1.49384877  1.50087938</span></span>
-<span><span class="co">#&gt;  [5,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.5129567 0.54343923  0.54626059</span></span>
-<span><span class="co">#&gt;  [6,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.0000000 0.00000000  0.00000000</span></span>
-<span><span class="co">#&gt;  [7,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.0000000 0.00000000  0.00000000</span></span>
-<span><span class="co">#&gt;  [8,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.0000000 0.00000000 -0.02052952</span></span>
-<span><span class="co">#&gt;  [9,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.0000000 0.09836035  0.12133931</span></span>
-<span><span class="co">#&gt; [10,] 0 0.0000000 0.000000 0.0000000 0.0000000 0.0000000 0.00000000  0.00000000</span></span>
+<span><span class="co">#&gt;       0        1         2         3        4          5         6          7</span></span>
+<span><span class="co">#&gt;  [1,] 0 0.000000 0.0000000 0.0000000 0.000000 0.00000000 0.3891072  0.4796295</span></span>
+<span><span class="co">#&gt;  [2,] 0 1.322444 1.7643587 1.7927558 1.815996 1.82674863 1.6585867  1.5881774</span></span>
+<span><span class="co">#&gt;  [3,] 0 0.000000 0.7668523 1.0622965 1.505906 1.54409629 1.8317578  1.8525377</span></span>
+<span><span class="co">#&gt;  [4,] 0 0.000000 0.0000000 0.7117919 1.242444 1.24696873 1.4155940  1.5031759</span></span>
+<span><span class="co">#&gt;  [5,] 0 0.000000 0.0000000 0.0000000 1.265540 1.26026568 1.1714536  1.2667594</span></span>
+<span><span class="co">#&gt;  [6,] 0 0.000000 0.0000000 0.0000000 0.000000 0.00000000 0.0000000  0.0000000</span></span>
+<span><span class="co">#&gt;  [7,] 0 0.000000 0.0000000 0.0000000 0.000000 0.00000000 0.0000000  0.0000000</span></span>
+<span><span class="co">#&gt;  [8,] 0 0.000000 0.0000000 0.0000000 0.000000 0.00000000 0.0000000 -0.1708010</span></span>
+<span><span class="co">#&gt;  [9,] 0 0.000000 0.0000000 0.0000000 0.000000 0.07579378 0.3980725  0.4907202</span></span>
+<span><span class="co">#&gt; [10,] 0 0.000000 0.0000000 0.0000000 0.000000 0.00000000 0.0000000  0.0000000</span></span>
 <span><span class="co">#&gt;                8           9          10</span></span>
-<span><span class="co">#&gt;  [1,]  0.8075922  0.82782069  0.84082195</span></span>
-<span><span class="co">#&gt;  [2,]  1.3906818  1.37802813  1.38094232</span></span>
-<span><span class="co">#&gt;  [3,]  0.9939535  0.99191463  0.99089740</span></span>
-<span><span class="co">#&gt;  [4,]  1.5213427  1.52301356  1.50873453</span></span>
-<span><span class="co">#&gt;  [5,]  0.5766311  0.58958660  0.57463633</span></span>
-<span><span class="co">#&gt;  [6,]  0.1242402  0.15114034  0.15712091</span></span>
-<span><span class="co">#&gt;  [7,]  0.0000000  0.00000000  0.09336494</span></span>
-<span><span class="co">#&gt;  [8,] -0.2786422 -0.32731577 -0.42745439</span></span>
-<span><span class="co">#&gt;  [9,]  0.3539239  0.39156728  0.43880903</span></span>
-<span><span class="co">#&gt; [10,]  0.0000000  0.04344313  0.06886472</span></span>
+<span><span class="co">#&gt;  [1,]  0.5330465  0.54579549  0.54692671</span></span>
+<span><span class="co">#&gt;  [2,]  1.5559290  1.56521806  1.58151433</span></span>
+<span><span class="co">#&gt;  [3,]  1.8733534  1.87579937  1.87630203</span></span>
+<span><span class="co">#&gt;  [4,]  1.5350429  1.52576450  1.51007617</span></span>
+<span><span class="co">#&gt;  [5,]  1.2858958  1.29775066  1.31948672</span></span>
+<span><span class="co">#&gt;  [6,]  0.1643652  0.21753474  0.22795925</span></span>
+<span><span class="co">#&gt;  [7,]  0.0000000  0.00000000  0.08031254</span></span>
+<span><span class="co">#&gt;  [8,] -0.3626785 -0.44723991 -0.52152406</span></span>
+<span><span class="co">#&gt;  [9,]  0.5716900  0.59486962  0.61188036</span></span>
+<span><span class="co">#&gt; [10,]  0.0000000  0.07243567  0.10115282</span></span>
 <span><span class="co">#&gt; attr(,"scaled:scale")</span></span>
 <span><span class="co">#&gt;  [1] 1 1 1 1 1 1 1 1 1 1</span></span></code></pre></div>
 </div>
