@@ -2,10 +2,8 @@
 #'
 #' @param x input design matrix
 #' @param y input response vector
-#' @param cor.method could be "pearson", "pair" and "gaussrank"
+#' @param cor.method could be "pearson" or "gaussrank"
 #' @param scale.method "sd" or "qn"
-#' @param pda.method "nearpd" or FALSE
-#' @param lmin min threshold of eigenvalues
 #' @param std If TRUE the robust correlation matrix is used,
 #'   if FALSE the robust covariance matrix is used.
 #' @param adaptive adaptive regularization penalties
@@ -102,16 +100,18 @@ covlasso = function(x, y, cor.method = "gaussrank", scale.method = "qn", center.
 }
 
 
-#' Title
+#' Copula lasso
 #'
-#' @param x
-#' @param y
-#' @param cor.method
-#' @param scale.method
-#' @param center.method
-#' @param adaptive
+#' @param x input design matrix
+#' @param y input response vector
+#' @param cor.method could be "pearson" or "gaussrank"
+#' @param scale.method "sd" or "qn"
+#' @param center.method mean or median
+#' @param adaptive lasso or adaptive lasso
 #'
-#' @return
+#' @return betahat_opt, the optimal estimation of beta obtained from this algorithm
+#' @return lambda_opt is the optimal tuning parameter and sigma_opt is the optimal estimation of sigma.
+#' @return The output also includes the estimated correlation matrix, the estimated covariance matrix others.
 #' @export
 #'
 #' @examples
